@@ -161,8 +161,8 @@ const Order = () => {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="h6" gutterBottom>
-                  Total: ${calculateTotal(quantity, distance).toFixed(2)}
-                  {distance > DELIVERY_THRESHOLD && (
+                  Total: ${calculateTotal(quantity, distance || 0).toFixed(2)}
+                  {distance && distance > DELIVERY_THRESHOLD && (
                     <Typography variant="caption" color="error" display="block">
                       * Includes ${ADDITIONAL_FEE} delivery fee for distance over {DELIVERY_THRESHOLD} miles
                     </Typography>
