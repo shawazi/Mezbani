@@ -12,10 +12,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid,
-  IconButton,
+  Grid
 } from '@mui/material'
-import { Add, Delete } from '@mui/icons-material'
+import { Add } from '@mui/icons-material'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { bangladeshGreen, bangladeshRed } from '../theme'
 import { getMenuItems, MenuItem as MenuItemType } from '../lib/firebase/firestore'
@@ -59,6 +58,7 @@ interface OrderFormData {
   email: string
   phone: string
   address?: string
+  zipCode?: string
 }
 
 const Order = () => {
@@ -68,6 +68,8 @@ const Order = () => {
     food: MenuItemType[]
   }>({ chai: [], food: [] })
   const [loading, setLoading] = useState(true)
+  const [deliveryTotal, setDeliveryTotal] = useState<string>('0.00')
+  const [cartTotal, setCartTotal] = useState<string>('0.00')
 
   const chaiDeliveryForm = useForm<OrderFormData>({
     defaultValues: {
@@ -78,6 +80,7 @@ const Order = () => {
       email: '',
       phone: '',
       address: '',
+      zipCode: '',
     },
   })
 
@@ -98,7 +101,14 @@ const Order = () => {
     // Future integration with SquareUp for cart
   })
 
-  const calculateTotal = (chaiItems: OrderItem[], foodItems: OrderItem[], distance?: number) => {
+  const calculateDistanceFromZip = async (zipCode: string) => {
+    // Placeholder function to calculate distance from zip code 02472
+    // In a real-world scenario, you would use an API to calculate the distance
+    if (zipCode === '02472') return 0
+    return 10 // Assume 10 miles for other zip codes for demonstration
+  }
+
+  const calculateTotal = async (chaiItems: OrderItem[], foodItems: OrderItem[], zipCode?: string) => {
     let total = 0
 
     chaiItems.forEach(item => {
@@ -115,8 +125,11 @@ const Order = () => {
       }
     })
 
-    if (distance && distance > DELIVERY_THRESHOLD) {
-      total += ADDITIONAL_FEE
+    if (zipCode) {
+      const distance = await calculateDistanceFromZip(zipCode)
+      if (distance > DELIVERY_THRESHOLD) {
+        total += ADDITIONAL_FEE
+      }
     }
 
     return total
@@ -152,6 +165,31 @@ const Order = () => {
 
     fetchMenuItems()
   }, [])
+
+  useEffect(() => {
+    const updateDeliveryTotal = async () => {
+      const total = await calculateTotal(
+        chaiDeliveryForm.watch('chaiItems') ?? [],
+        chaiDeliveryForm.watch('foodItems') ?? [],
+        chaiDeliveryForm.watch('zipCode')
+      )
+      setDeliveryTotal(total.toFixed(2))
+    }
+
+    updateDeliveryTotal()
+  }, [chaiDeliveryForm.watch('chaiItems'), chaiDeliveryForm.watch('foodItems'), chaiDeliveryForm.watch('zipCode')])
+
+  useEffect(() => {
+    const updateCartTotal = async () => {
+      const total = await calculateTotal(
+        chaiCartForm.watch('chaiItems') ?? [],
+        chaiCartForm.watch('foodItems') ?? []
+      )
+      setCartTotal(total.toFixed(2))
+    }
+
+    updateCartTotal()
+  }, [chaiCartForm.watch('chaiItems'), chaiCartForm.watch('foodItems')])
 
   if (loading) {
     return <LoadingSpinner />
@@ -267,6 +305,19 @@ const Order = () => {
                     }}
                   />
                 </Grid>
+                <Grid item xs={12} sx={{ px: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="Zip Code"
+                    type="text"
+                    {...chaiDeliveryForm.register('zipCode')}
+                    InputProps={{ 
+                      inputProps: { 
+                        'aria-label': 'Zip Code',
+                      }
+                    }}
+                  />
+                </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}>
@@ -336,12 +387,7 @@ const Order = () => {
 
             <Box sx={{ p: 3, textAlign: 'right' }}>
               <Typography variant="h5" gutterBottom>
-                Total: ${calculateTotal(chaiDeliveryForm.watch('chaiItems'), chaiDeliveryForm.watch('foodItems'), chaiDeliveryForm.watch('distance')).toFixed(2)}
-                {chaiDeliveryForm.watch('distance') && chaiDeliveryForm.watch('distance') > DELIVERY_THRESHOLD && (
-                  <Typography variant="caption" color="error" component="div">
-                    * Includes ${ADDITIONAL_FEE} delivery fee
-                  </Typography>
-                )}
+                Total: ${deliveryTotal}
               </Typography>
               <Button
                 type="submit"
@@ -494,7 +540,7 @@ const Order = () => {
 
             <Box sx={{ p: 3, textAlign: 'right' }}>
               <Typography variant="h5" gutterBottom>
-                Total: ${calculateTotal(chaiCartForm.watch('chaiItems'), chaiCartForm.watch('foodItems')).toFixed(2)}
+                Total: ${cartTotal}
               </Typography>
               <Button
                 type="submit"
@@ -511,7 +557,9 @@ const Order = () => {
               </Button>
             </Box>
           </TabPanel>
+
         </form>
+
       </Paper>
     </Container>
   )
