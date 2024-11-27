@@ -3,17 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /menu/{menuItem} {
-      allow read: if
-        // Allow authenticated users (including anonymous)
-        request.auth != null &&
-        // Allow from your domains
-        (
-          request.origin.matches('https://mezbani-14d1e.web.app') || 
-          request.origin.matches('https://mezbani-14d1e.firebaseapp.com') ||
-          // Allow localhost for development
-          request.origin.matches('http://localhost:*')
-        );
-      
+      allow read: if true;  // Allow all reads for testing
       allow write: if false;  // Only allow writes through admin SDK
     }
   }
