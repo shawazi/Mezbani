@@ -22,6 +22,7 @@ import { bangladeshGreen, bangladeshRed } from '../theme'
 import { getMenuItems, MenuItem as MenuItemType } from '../lib/firebase/firestore'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { calculateDistanceFromWatertown, ZipCodeError } from '../utils/zipcode'
+import { useNavigate } from 'react-router-dom';
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -80,6 +81,7 @@ const Order = () => {
   const [cartFee, setCartFee] = useState<number>(0)
   const [zipError, setZipError] = useState<string | null>(null)
   const [cartZipError, setCartZipError] = useState<string | null>(null)
+  const navigate = useNavigate();
 
   const chaiDeliveryForm = useForm<OrderFormData>({
     defaultValues: {
@@ -101,15 +103,63 @@ const Order = () => {
     },
   })
 
-  const handleDeliverySubmit = chaiDeliveryForm.handleSubmit((data) => {
-    console.log(`Delivery Order submitted: ${JSON.stringify(data)}`)
-    // Future integration with SquareUp for delivery
-  })
+  const handleDeliverySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = chaiDeliveryForm.getValues();
+    
+    // Prepare order data
+    const orderData = {
+      items: [
+        ...formData.chaiItems.map(item => ({
+          ...item,
+          name: menuItems.chai.find(i => i.id === item.id)?.name || '',
+          price: menuItems.chai.find(i => i.id === item.id)?.price || 0,
+        })),
+        ...formData.foodItems.map(item => ({
+          ...item,
+          name: menuItems.food.find(i => i.id === item.id)?.name || '',
+          price: menuItems.food.find(i => i.id === item.id)?.price || 0,
+        }))
+      ],
+      subtotal: deliverySubtotal,
+      deliveryFee: calculateDeliveryFee(formData.distance),
+      total: deliveryTotal,
+      zipCode: formData.zipCode,
+      distance: formData.distance,
+    };
 
-  const handleCartSubmit = chaiCartForm.handleSubmit((data) => {
-    console.log(`Cart Order submitted: ${JSON.stringify(data)}`)
-    // Future integration with SquareUp for cart
-  })
+    // Navigate to checkout with order data
+    navigate('/checkout', { state: { orderData } });
+  };
+
+  const handleCartSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = chaiCartForm.getValues();
+    
+    // Prepare order data
+    const orderData = {
+      items: [
+        ...formData.chaiItems.map(item => ({
+          ...item,
+          name: menuItems.chai.find(i => i.id === item.id)?.name || '',
+          price: menuItems.chai.find(i => i.id === item.id)?.price || 0,
+        })),
+        ...formData.foodItems.map(item => ({
+          ...item,
+          name: menuItems.food.find(i => i.id === item.id)?.name || '',
+          price: menuItems.food.find(i => i.id === item.id)?.price || 0,
+        }))
+      ],
+      subtotal: cartSubtotal,
+      deliveryFee: calculateDeliveryFee(formData.distance),
+      total: cartTotal,
+      zipCode: formData.zipCode,
+      distance: formData.distance,
+    };
+
+    // Navigate to checkout with order data
+    navigate('/checkout', { state: { orderData } });
+  };
 
   const handleZipCodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const zipCode = e.target.value.trim();

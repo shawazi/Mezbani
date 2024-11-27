@@ -9,6 +9,7 @@ import Events from './pages/Events'
 import Contact from './pages/Contact'
 import FAQs from './pages/FAQs'
 import Order from './pages/Order'
+import Checkout from './pages/Checkout'
 
 function App() {
   return (
@@ -16,13 +17,14 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route element={<Layout />}>
+          <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="menu" element={<Menu />} />
             <Route path="events" element={<Events />} />
             <Route path="contact" element={<Contact />} />
             <Route path="faqs" element={<FAQs />} />
             <Route path="order" element={<Order />} />
+            <Route path="checkout" element={<Checkout />} />
           </Route>
         </Routes>
       </Router>
