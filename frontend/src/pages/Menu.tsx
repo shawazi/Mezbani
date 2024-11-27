@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Container, Typography, Box, Grid, Card, CardContent, CardMedia } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 import { MenuItem, getMenuItems } from '../lib/firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
