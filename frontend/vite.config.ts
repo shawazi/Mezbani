@@ -29,6 +29,27 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: true,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: [
+              'react',
+              'react-dom',
+              'react-router-dom',
+              '@mui/material',
+              '@emotion/react',
+              '@emotion/styled'
+            ],
+            firebase: [
+              'firebase/app',
+              'firebase/auth',
+              'firebase/firestore',
+              'firebase/storage'
+            ]
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000
     },
     define: {
       __FIREBASE_CONFIG__: {
