@@ -14,12 +14,14 @@ import {
   MenuItem,
   Grid,
   IconButton,
+  Alert,
 } from '@mui/material'
 import { Add, Delete } from '@mui/icons-material'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { bangladeshGreen, bangladeshRed } from '../theme'
 import { getMenuItems, MenuItem as MenuItemType } from '../lib/firebase/firestore'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { calculateDistanceFromWatertown, ZipCodeError } from '../utils/zipcode'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -44,6 +46,7 @@ const TabPanel = (props: TabPanelProps) => {
 }
 
 const DELIVERY_THRESHOLD = 30 // miles
+const DELIVERY_FEE = 20 // dollars per 30 mile increment
 const ADDITIONAL_FEE = 25 // dollars
 
 interface OrderItem {
@@ -71,6 +74,9 @@ const Order = () => {
   const [loading, setLoading] = useState(true)
   const [deliveryTotal, setDeliveryTotal] = useState<string>('0.00')
   const [cartTotal, setCartTotal] = useState<string>('0.00')
+  const [deliverySubtotal, setDeliverySubtotal] = useState<string>('0.00')
+  const [deliveryFee, setDeliveryFee] = useState<number>(0)
+  const [zipError, setZipError] = useState<string | null>(null);
 
   const chaiDeliveryForm = useForm<OrderFormData>({
     defaultValues: {
@@ -102,6 +108,29 @@ const Order = () => {
     // Future integration with SquareUp for cart
   })
 
+  const handleZipCodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const zipCode = e.target.value.trim();
+    chaiDeliveryForm.setValue('zipCode', zipCode);
+    
+    if (zipCode.length === 5) {
+      try {
+        setZipError(null);
+        const distance = await calculateDistanceFromWatertown(zipCode);
+        chaiDeliveryForm.setValue('distance', distance);
+        void updateDeliveryTotal();
+      } catch (error) {
+        if (error instanceof ZipCodeError) {
+          setZipError(error.message);
+        } else {
+          setZipError('Error calculating distance');
+        }
+        chaiDeliveryForm.setValue('distance', undefined);
+      }
+    } else {
+      chaiDeliveryForm.setValue('distance', undefined);
+    }
+  };
+
   const calculateDistanceFromZip = useCallback(async (zipCode: string) => {
     // Placeholder function to calculate distance from zip code 02472
     // In a real-world scenario, you would use an API to calculate the distance
@@ -109,32 +138,77 @@ const Order = () => {
     return 10 // Assume 10 miles for other zip codes for demonstration
   }, [])
 
-  const calculateTotal = useCallback(async (chaiItems: OrderItem[], foodItems: OrderItem[], zipCode?: string) => {
-    let total = 0
+  const calculateDeliveryFee = (distance: number | undefined): number => {
+    if (!distance) return 0;
+    const increments = Math.floor(distance / DELIVERY_THRESHOLD);
+    return increments * DELIVERY_FEE;
+  };
 
-    chaiItems.forEach(item => {
-      const chaiItem = menuItems.chai.find(chai => chai.id === item.id)
-      if (chaiItem) {
-        total += chaiItem.price * item.quantity
-      }
-    })
+  const calculateSubtotal = async (
+    chaiItems: OrderItem[],
+    foodItems: OrderItem[],
+  ): Promise<number> => {
+    let total = 0;
 
-    foodItems.forEach(item => {
-      const foodItem = menuItems.food.find(food => food.id === item.id)
-      if (foodItem) {
-        total += foodItem.price * item.quantity
-      }
-    })
-
-    if (zipCode) {
-      const distance = await calculateDistanceFromZip(zipCode)
-      if (distance > DELIVERY_THRESHOLD) {
-        total += ADDITIONAL_FEE
+    // Calculate chai total
+    for (const item of chaiItems) {
+      const menuItem = menuItems.chai.find((i) => i.id === item.id);
+      if (menuItem) {
+        total += menuItem.price * item.quantity;
       }
     }
 
-    return total
-  }, [menuItems, calculateDistanceFromZip])
+    // Calculate food total
+    for (const item of foodItems) {
+      const menuItem = menuItems.food.find((i) => i.id === item.id);
+      if (menuItem) {
+        total += menuItem.price * item.quantity;
+      }
+    }
+
+    return total;
+  };
+
+  const calculateTotal = async (
+    chaiItems: OrderItem[],
+    foodItems: OrderItem[],
+    zipCode?: string
+  ): Promise<{ subtotal: number; deliveryFee: number; total: number }> => {
+    const subtotal = await calculateSubtotal(chaiItems, foodItems);
+    let distance = chaiDeliveryForm.getValues('distance') ?? 0;
+    
+    if (zipCode && distance === 0) {
+      try {
+        distance = await calculateDistanceFromWatertown(zipCode);
+      } catch (error) {
+        console.error('Error calculating distance:', error);
+      }
+    }
+
+    const deliveryFee = calculateDeliveryFee(distance);
+    const total = subtotal + deliveryFee;
+
+    return { subtotal, deliveryFee, total };
+  };
+
+  const updateDeliveryTotal = async () => {
+    const { subtotal, deliveryFee, total } = await calculateTotal(
+      chaiDeliveryForm.getValues('chaiItems') ?? [],
+      chaiDeliveryForm.getValues('foodItems') ?? [],
+      chaiDeliveryForm.getValues('zipCode')
+    );
+    setDeliveryTotal(total.toFixed(2));
+    setDeliverySubtotal(subtotal.toFixed(2));
+    setDeliveryFee(deliveryFee);
+  };
+
+  const updateCartTotal = async () => {
+    const { total } = await calculateTotal(
+      chaiCartForm.getValues('chaiItems') ?? [],
+      chaiCartForm.getValues('foodItems') ?? []
+    );
+    setCartTotal(total.toFixed(2));
+  };
 
   const { fields: chaiDeliveryFields, append: appendChaiDeliveryItem, remove: removeChaiDeliveryItem } = useFieldArray({
     control: chaiDeliveryForm.control,
@@ -166,23 +240,6 @@ const Order = () => {
 
     fetchMenuItems()
   }, [])
-
-  const updateDeliveryTotal = async () => {
-    const total = await calculateTotal(
-      chaiDeliveryForm.getValues('chaiItems') ?? [],
-      chaiDeliveryForm.getValues('foodItems') ?? [],
-      chaiDeliveryForm.getValues('zipCode')
-    )
-    setDeliveryTotal(total.toFixed(2))
-  }
-
-  const updateCartTotal = async () => {
-    const total = await calculateTotal(
-      chaiCartForm.getValues('chaiItems') ?? [],
-      chaiCartForm.getValues('foodItems') ?? []
-    )
-    setCartTotal(total.toFixed(2))
-  }
 
   if (loading) {
     return <LoadingSpinner />
@@ -301,29 +358,28 @@ const Order = () => {
                 <Grid item xs={12} sx={{ px: 3 }}>
                   <TextField
                     fullWidth
-                    label="Distance from Watertown, MA (miles)"
-                    type="number"
-                    {...chaiDeliveryForm.register('distance', { 
-                      min: 0,
-                      valueAsNumber: true 
-                    })}
-                    InputProps={{ 
-                      inputProps: { 
-                        min: 0,
-                        'aria-label': 'Distance in miles',
-                      }
+                    label="Zip Code"
+                    type="text"
+                    onChange={handleZipCodeChange}
+                    error={!!zipError}
+                    helperText={zipError}
+                    inputProps={{ 
+                      maxLength: 5,
+                      pattern: "[0-9]*",
+                      'aria-label': 'Zip Code',
                     }}
                   />
                 </Grid>
                 <Grid item xs={12} sx={{ px: 3 }}>
                   <TextField
                     fullWidth
-                    label="Zip Code"
-                    type="text"
-                    {...chaiDeliveryForm.register('zipCode')}
+                    label="Distance from Watertown, MA (miles)"
+                    type="number"
+                    {...chaiDeliveryForm.register('distance')}
                     InputProps={{ 
+                      readOnly: true,
                       inputProps: { 
-                        'aria-label': 'Zip Code',
+                        'aria-label': 'Distance in miles',
                       }
                     }}
                   />
@@ -406,6 +462,15 @@ const Order = () => {
             </Grid>
 
             <Box sx={{ p: 3, textAlign: 'right' }}>
+              <Typography variant="body1" gutterBottom>
+                Subtotal: ${deliverySubtotal}
+              </Typography>
+              {deliveryFee > 0 && (
+                <Typography variant="body1" color="warning.main" gutterBottom>
+                  Delivery Fee: ${deliveryFee.toFixed(2)} 
+                  ({Math.floor((chaiDeliveryForm.getValues('distance') ?? 0) / DELIVERY_THRESHOLD)} x ${DELIVERY_FEE} per {DELIVERY_THRESHOLD} miles)
+                </Typography>
+              )}
               <Typography variant="h5" gutterBottom>
                 Total: ${deliveryTotal}
               </Typography>
