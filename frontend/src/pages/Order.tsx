@@ -75,8 +75,11 @@ const Order = () => {
   const [deliveryTotal, setDeliveryTotal] = useState<string>('0.00')
   const [cartTotal, setCartTotal] = useState<string>('0.00')
   const [deliverySubtotal, setDeliverySubtotal] = useState<string>('0.00')
+  const [cartSubtotal, setCartSubtotal] = useState<string>('0.00')
   const [deliveryFee, setDeliveryFee] = useState<number>(0)
-  const [zipError, setZipError] = useState<string | null>(null);
+  const [cartFee, setCartFee] = useState<number>(0)
+  const [zipError, setZipError] = useState<string | null>(null)
+  const [cartZipError, setCartZipError] = useState<string | null>(null)
 
   const chaiDeliveryForm = useForm<OrderFormData>({
     defaultValues: {
@@ -128,6 +131,29 @@ const Order = () => {
       }
     } else {
       chaiDeliveryForm.setValue('distance', undefined);
+    }
+  };
+
+  const handleCartZipCodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const zipCode = e.target.value.trim();
+    chaiCartForm.setValue('zipCode', zipCode);
+    
+    if (zipCode.length === 5) {
+      try {
+        setCartZipError(null);
+        const distance = await calculateDistanceFromWatertown(zipCode);
+        chaiCartForm.setValue('distance', distance);
+        void updateCartTotal();
+      } catch (error) {
+        if (error instanceof ZipCodeError) {
+          setCartZipError(error.message);
+        } else {
+          setCartZipError('Error calculating distance');
+        }
+        chaiCartForm.setValue('distance', undefined);
+      }
+    } else {
+      chaiCartForm.setValue('distance', undefined);
     }
   };
 
@@ -203,11 +229,14 @@ const Order = () => {
   };
 
   const updateCartTotal = async () => {
-    const { total } = await calculateTotal(
+    const { subtotal, deliveryFee, total } = await calculateTotal(
       chaiCartForm.getValues('chaiItems') ?? [],
-      chaiCartForm.getValues('foodItems') ?? []
+      chaiCartForm.getValues('foodItems') ?? [],
+      chaiCartForm.getValues('zipCode')
     );
     setCartTotal(total.toFixed(2));
+    setCartSubtotal(subtotal.toFixed(2));
+    setCartFee(deliveryFee);
   };
 
   const { fields: chaiDeliveryFields, append: appendChaiDeliveryItem, remove: removeChaiDeliveryItem } = useFieldArray({
@@ -376,6 +405,9 @@ const Order = () => {
                     label="Distance from Watertown, MA (miles)"
                     type="number"
                     {...chaiDeliveryForm.register('distance')}
+                    InputLabelProps={{ 
+                      shrink: true
+                    }}
                     InputProps={{ 
                       readOnly: true,
                       inputProps: { 
@@ -573,6 +605,38 @@ const Order = () => {
                     Add Another Chai
                   </Button>
                 </Grid>
+                <Grid item xs={12} sx={{ px: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="Zip Code"
+                    type="text"
+                    onChange={handleCartZipCodeChange}
+                    error={!!cartZipError}
+                    helperText={cartZipError}
+                    inputProps={{ 
+                      maxLength: 5,
+                      pattern: "[0-9]*",
+                      'aria-label': 'Zip Code',
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sx={{ px: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="Distance from Watertown, MA (miles)"
+                    type="number"
+                    {...chaiCartForm.register('distance')}
+                    InputLabelProps={{ 
+                      shrink: true
+                    }}
+                    InputProps={{ 
+                      readOnly: true,
+                      inputProps: { 
+                        'aria-label': 'Distance in miles',
+                      }
+                    }}
+                  />
+                </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}>
@@ -651,6 +715,15 @@ const Order = () => {
             </Grid>
 
             <Box sx={{ p: 3, textAlign: 'right' }}>
+              <Typography variant="body1" gutterBottom>
+                Subtotal: ${cartSubtotal}
+              </Typography>
+              {cartFee > 0 && (
+                <Typography variant="body1" color="warning.main" gutterBottom>
+                  Delivery Fee: ${cartFee.toFixed(2)} 
+                  ({Math.floor((chaiCartForm.getValues('distance') ?? 0) / DELIVERY_THRESHOLD)} x ${DELIVERY_FEE} per {DELIVERY_THRESHOLD} miles)
+                </Typography>
+              )}
               <Typography variant="h5" gutterBottom>
                 Total: ${cartTotal}
               </Typography>
