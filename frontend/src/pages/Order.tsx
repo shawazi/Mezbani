@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Container,
   Box,
@@ -14,7 +14,7 @@ import {
   MenuItem,
   Grid,
   IconButton,
-  Alert,
+  // Alert,
 } from '@mui/material'
 import { Add, Delete } from '@mui/icons-material'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
@@ -47,7 +47,7 @@ const TabPanel = (props: TabPanelProps) => {
 
 const DELIVERY_THRESHOLD = 30 // miles
 const DELIVERY_FEE = 20 // dollars per 30 mile increment
-const ADDITIONAL_FEE = 25 // dollars
+// const ADDITIONAL_FEE = 25 // dollars
 
 interface OrderItem {
   id: string
@@ -156,13 +156,6 @@ const Order = () => {
       chaiCartForm.setValue('distance', undefined);
     }
   };
-
-  const calculateDistanceFromZip = useCallback(async (zipCode: string) => {
-    // Placeholder function to calculate distance from zip code 02472
-    // In a real-world scenario, you would use an API to calculate the distance
-    if (zipCode === '02472') return 0
-    return 10 // Assume 10 miles for other zip codes for demonstration
-  }, [])
 
   const calculateDeliveryFee = (distance: number | undefined): number => {
     if (!distance) return 0;
