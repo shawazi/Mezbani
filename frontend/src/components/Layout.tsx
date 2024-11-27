@@ -77,33 +77,44 @@ const Layout = () => {
   )
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      minHeight: '100vh', 
-      width: '100%', 
-      maxWidth: '100%',
-      margin: 0, 
-      padding: 0,
-      bgcolor: 'background.default',
-      color: 'text.primary',
-      overflowX: 'hidden',
-    }}>
+    <Box 
+      component="div"
+      sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh',
+        width: '100%',
+        maxWidth: '100%',
+        margin: 0,
+        padding: 0,
+        bgcolor: 'background.default',
+        color: 'text.primary',
+        overflowX: 'hidden',
+      }}
+    >
       <AppBar 
         position="sticky" 
         elevation={0}
         sx={{ 
           backgroundColor: bangladeshGreen,
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+          width: '100%',
         }}
       >
-        <Container maxWidth="lg" sx={{ width: '100%', px: { xs: 2, sm: 3 } }}>
+        <Container 
+          maxWidth="lg" 
+          sx={{ 
+            margin: '0 auto',
+            px: { xs: 2, sm: 3 },
+          }}
+        >
           <Toolbar 
             disableGutters 
+            variant="dense"
             sx={{ 
               justifyContent: 'space-between',
-              minHeight: { xs: '56px', sm: '64px' }, 
-              py: { xs: 0.5, sm: 0.75 } 
+              minHeight: { xs: '40px', sm: '44px' },
+              py: 0,
             }}
           >
             <Typography
@@ -114,7 +125,8 @@ const Layout = () => {
                 textDecoration: 'none',
                 color: 'black',
                 fontWeight: 'bold',
-                fontSize: { xs: '1.2rem', sm: '1.5rem' },
+                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                lineHeight: 1,
               }}
             >
               Mezbani Chai House
@@ -126,15 +138,18 @@ const Layout = () => {
                 aria-label="open drawer"
                 edge="end"
                 onClick={handleDrawerToggle}
-                sx={{ color: 'black' }}
+                sx={{ 
+                  color: 'black',
+                  padding: '4px',
+                }}
               >
-                <MenuIcon />
+                <MenuIcon fontSize="small" />
               </IconButton>
             ) : (
               <Box 
                 sx={{ 
                   display: 'flex', 
-                  gap: 2,
+                  gap: 1.5,
                   alignItems: 'center',
                 }}
               >
@@ -146,9 +161,10 @@ const Layout = () => {
                     sx={{
                       color: 'black',
                       opacity: location.pathname === item.path ? 1 : 0.8,
-                      fontSize: { sm: '1rem', md: '1.1rem' }, 
-                      textTransform: 'none', 
-                      py: 0.5, 
+                      fontSize: { sm: '0.9rem', md: '1rem' },
+                      textTransform: 'none',
+                      py: 0.25,
+                      minHeight: 0,
                       '&:hover': {
                         opacity: 1,
                         backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -184,14 +200,26 @@ const Layout = () => {
         {drawer}
       </Drawer>
 
-      <Box component="main" sx={{ flexGrow: 1, width: '100%' }}>
-        <Outlet />
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1,
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+        }}
+      >
+        <Box sx={{ width: '100%' }}>
+          <Outlet />
+        </Box>
       </Box>
 
       <Box
         component="footer"
         sx={{
-          py: 3,
+          width: '100%',
+          py: { xs: 1.5, sm: 2 },
           px: 2,
           mt: 'auto',
           backgroundColor: bangladeshGreen,
@@ -200,7 +228,7 @@ const Layout = () => {
         }}
       >
         <Container maxWidth="lg">
-          <Typography variant="body2" align="center" sx={{ mb: 1 }}>
+          <Typography variant="body2" align="center" sx={{ mb: 0.5 }}>
             {new Date().getFullYear()} Mezbani Chai House. All rights reserved.
           </Typography>
           <Typography variant="body2" align="center">
@@ -210,13 +238,12 @@ const Layout = () => {
               rel="noopener"
               sx={{ 
                 color: 'white',
-                opacity: 0.8,
                 '&:hover': {
-                  opacity: 1,
+                  color: 'rgba(255, 255, 255, 0.8)',
                 },
               }}
             >
-              Located in Watertown, MA
+              123 Main Street, Watertown, MA 02472
             </Link>
           </Typography>
         </Container>

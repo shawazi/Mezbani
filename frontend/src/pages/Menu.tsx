@@ -49,7 +49,16 @@ const menuItems = [
 
 const Menu = () => {
   return (
-    <Container maxWidth="lg">
+    <Container 
+      maxWidth="lg"
+      sx={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        py: { xs: 4, md: 6 },
+      }}
+    >
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography
           variant="h1"

@@ -86,7 +86,16 @@ const Order = () => {
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container 
+      maxWidth="lg"
+      sx={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        py: { xs: 4, md: 6 },
+      }}
+    >
       <Typography variant="h1" component="h1" align="center" gutterBottom>
         Place Your Order
       </Typography>

@@ -11,13 +11,28 @@ import { bangladeshRed } from '../theme'
 
 const Home = () => {
   return (
-    <Box sx={{ width: '100%', margin: 0, padding: 0 }}>
+    <Box sx={{ width: '100%' }}>
       <Box sx={{ 
-        bgcolor: 'rgba(0, 106, 78, 0.1)',
-        py: { xs: 6, md: 8 },
-        width: '100%'
+        bgcolor: 'background.paper',
+        pt: { xs: 6, sm: 8 },
+        pb: { xs: 8, sm: 12 },
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
       }}>
-        <Container maxWidth="lg" sx={{ mx: 'auto' }}>
+        <Container 
+          maxWidth="lg" 
+          disableGutters={false}
+          sx={{ 
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            px: { xs: 2, sm: 3 },
+            margin: '0 auto',
+          }}
+        >
           <Box sx={{ textAlign: 'center' }}>
             <Typography
               variant="h1"
@@ -68,7 +83,19 @@ const Home = () => {
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 }, mx: 'auto' }}>
+      <Container 
+        maxWidth="lg"
+        disableGutters={false}
+        sx={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          py: { xs: 4, md: 6 },
+          px: { xs: 2, sm: 3 },
+          margin: '0 auto',
+        }}
+      >
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
             <Paper
