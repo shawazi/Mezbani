@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Container,
   Box,
@@ -101,14 +101,14 @@ const Order = () => {
     // Future integration with SquareUp for cart
   })
 
-  const calculateDistanceFromZip = async (zipCode: string) => {
+  const calculateDistanceFromZip = useCallback(async (zipCode: string) => {
     // Placeholder function to calculate distance from zip code 02472
     // In a real-world scenario, you would use an API to calculate the distance
     if (zipCode === '02472') return 0
     return 10 // Assume 10 miles for other zip codes for demonstration
-  }
+  }, [])
 
-  const calculateTotal = async (chaiItems: OrderItem[], foodItems: OrderItem[], zipCode?: string) => {
+  const calculateTotal = useCallback(async (chaiItems: OrderItem[], foodItems: OrderItem[], zipCode?: string) => {
     let total = 0
 
     chaiItems.forEach(item => {
@@ -133,7 +133,7 @@ const Order = () => {
     }
 
     return total
-  }
+  }, [menuItems, calculateDistanceFromZip])
 
   const { fields: chaiDeliveryFields, append: appendChaiDeliveryItem } = useFieldArray({
     control: chaiDeliveryForm.control,
