@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Container, Typography, Box, Grid, Card, CardContent, CardMedia } from '@mui/material';
 import { MenuItem, getMenuItems } from '../lib/firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -6,6 +6,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 const Menu = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const chaiBannerRef = useRef<HTMLDivElement>(null);
+  const snacksBannerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -15,6 +17,27 @@ const Menu = () => {
     };
 
     fetchMenuItems();
+
+    const handleScroll = () => {
+      requestAnimationFrame(() => {
+        const scrolled = window.scrollY;
+        if (chaiBannerRef.current) {
+          const chaiBannerRect = chaiBannerRef.current.getBoundingClientRect();
+          const chaiOffset = chaiBannerRect.top + scrolled;
+          const chaiParallax = (scrolled - chaiOffset) * 0.5;
+          chaiBannerRef.current.style.transform = `translate3d(0, ${chaiParallax}px, 0)`;
+        }
+        if (snacksBannerRef.current) {
+          const snacksBannerRect = snacksBannerRef.current.getBoundingClientRect();
+          const snacksOffset = snacksBannerRect.top + scrolled;
+          const snacksParallax = (scrolled - snacksOffset) * 0.5;
+          snacksBannerRef.current.style.transform = `translate3d(0, ${snacksParallax}px, 0)`;
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   if (loading) {
@@ -25,17 +48,17 @@ const Menu = () => {
   const foodItems = menuItems.filter(item => item.category === 'food');
 
   return (
-    <Container 
-      maxWidth="lg"
-      sx={{ 
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '100%',
-        py: { xs: 4, md: 6 },
-      }}
-    >
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+    <Box sx={{ overflow: 'hidden' }}>
+      {/* Header */}
+      <Box 
+        sx={{ 
+          textAlign: 'center',
+          py: { xs: 4, md: 6 },
+          position: 'relative',
+          zIndex: 2,
+          backgroundColor: 'background.paper',
+        }}
+      >
         <Typography
           variant="h1"
           component="h1"
@@ -52,117 +75,169 @@ const Menu = () => {
         </Typography>
       </Box>
 
-      {/* Chai Section */}
-      <Box sx={{ width: '100%', mb: 8 }}>
-        <Typography
-          variant="h2"
-          component="h2"
+      {/* Chai Section with Parallax */}
+      <Box 
+        sx={{ 
+          position: 'relative',
+          height: '400px',
+          overflow: 'hidden',
+          mb: 4
+        }}
+      >
+        <Box
+          ref={chaiBannerRef}
           sx={{
-            fontSize: { xs: '2rem', sm: '2.5rem' },
-            fontWeight: 700,
-            mb: 4,
-            textAlign: 'center',
+            position: 'absolute',
+            top: '-100px',
+            left: 0,
+            width: '100%',
+            height: '600px',
+            backgroundImage: 'url(/images/chai-banner.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1,
+            willChange: 'transform',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2,
           }}
         >
-          Chai Selection
-        </Typography>
-        <Grid container spacing={3}>
-          {chaiItems.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.id}>
-              <Card 
-                elevation={0}
-                sx={{ 
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  backgroundColor: 'background.paper',
-                  borderRadius: 2,
-                }}
-              >
-                {item.imageUrl && (
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={item.imageUrl}
-                    alt={item.name}
-                    sx={{ objectFit: 'cover' }}
-                  />
-                )}
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" component="h3" gutterBottom>
-                    {item.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" paragraph>
-                    {item.description}
-                  </Typography>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    ${item.price.toFixed(2)}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+          <Typography
+            variant="h2"
+            sx={{
+              color: 'white',
+              fontSize: { xs: '2rem', sm: '2.5rem' },
+              fontWeight: 700,
+              textAlign: 'center',
+            }}
+          >
+            Chai Selection
+          </Typography>
+        </Box>
       </Box>
 
-      {/* Food Section */}
-      <Box sx={{ width: '100%' }}>
-        <Typography
-          variant="h2"
-          component="h2"
+      {/* Chai Items */}
+      <Container maxWidth="lg" sx={{ mb: 8 }}>
+        <Box sx={{ py: 4 }}>
+          {chaiItems.map((item, index) => (
+            <Box
+              key={item.id}
+              sx={{
+                py: 3,
+                borderBottom: index < chaiItems.length - 1 ? '2px dashed rgba(0, 0, 0, 0.12)' : 'none',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 1 }}>
+                <Typography variant="h6" component="h3">
+                  {item.name}
+                </Typography>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  ${item.price.toFixed(2)}
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                {item.description}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Container>
+
+      {/* Food Section with Parallax */}
+      <Box 
+        sx={{ 
+          position: 'relative',
+          height: '400px',
+          overflow: 'hidden',
+          mb: 4
+        }}
+      >
+        <Box
+          ref={snacksBannerRef}
           sx={{
-            fontSize: { xs: '2rem', sm: '2.5rem' },
-            fontWeight: 700,
-            mb: 4,
-            textAlign: 'center',
+            position: 'absolute',
+            top: '-100px',
+            left: 0,
+            width: '100%',
+            height: '600px',
+            backgroundImage: 'url(/images/snacks-banner.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1,
+            willChange: 'transform',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2,
           }}
         >
-          Food & Snacks
-        </Typography>
-        <Grid container spacing={3}>
-          {foodItems.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.id}>
-              <Card 
-                elevation={0}
-                sx={{ 
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  backgroundColor: 'background.paper',
-                  borderRadius: 2,
-                }}
-              >
-                {item.imageUrl && (
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={item.imageUrl}
-                    alt={item.name}
-                    sx={{ objectFit: 'cover' }}
-                  />
-                )}
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" component="h3" gutterBottom>
-                    {item.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" paragraph>
-                    {item.description}
-                  </Typography>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    ${item.price.toFixed(2)}
-                  </Typography>
-                  {item.spiceLevel && (
-                    <Typography variant="body2" color="error">
-                      Spice Level: {'🌶️'.repeat(item.spiceLevel)}
-                    </Typography>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+          <Typography
+            variant="h2"
+            sx={{
+              color: 'white',
+              fontSize: { xs: '2rem', sm: '2.5rem' },
+              fontWeight: 700,
+              textAlign: 'center',
+            }}
+          >
+            Food & Snacks
+          </Typography>
+        </Box>
       </Box>
-    </Container>
+
+      {/* Food Items */}
+      <Container maxWidth="lg" sx={{ mb: 8 }}>
+        <Box sx={{ py: 4 }}>
+          {foodItems.map((item, index) => (
+            <Box
+              key={item.id}
+              sx={{
+                py: 3,
+                borderBottom: index < foodItems.length - 1 ? '2px dashed rgba(0, 0, 0, 0.12)' : 'none',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 1 }}>
+                <Typography variant="h6" component="h3">
+                  {item.name}
+                </Typography>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  ${item.price.toFixed(2)}
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                {item.description}
+              </Typography>
+              {item.spiceLevel && (
+                <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                  Spice Level: {'🌶️'.repeat(item.spiceLevel)}
+                </Typography>
+              )}
+            </Box>
+          ))}
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
