@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Container,
   Box,
@@ -16,6 +16,8 @@ import {
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { bangladeshGreen, bangladeshRed } from '../theme'
+import { getMenuItems } from '../lib/firebase/firestore'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -39,14 +41,12 @@ const TabPanel = (props: TabPanelProps) => {
   )
 }
 
-const chaiOptions = [16, 32, 50, 66, 82, 100]
-const chaiTypes = ['Classic', 'Masala', 'Elaichi', 'Ginger', 'Mint']
 const DELIVERY_THRESHOLD = 30 // miles
 const ADDITIONAL_FEE = 25 // dollars
 const PRICE_PER_CUP = 3.5
 
 interface OrderFormData {
-  chaiType: string
+  menuItem: string
   quantity: number
   distance?: number
   name: string
@@ -57,9 +57,11 @@ interface OrderFormData {
 
 const Order = () => {
   const [tabValue, setTabValue] = useState(0)
+  const [menuItems, setMenuItems] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const { control, watch, handleSubmit } = useForm<OrderFormData>({
     defaultValues: {
-      chaiType: '',
+      menuItem: '',
       quantity: 16,
       distance: 0,
       name: '',
@@ -71,6 +73,20 @@ const Order = () => {
 
   const quantity = watch('quantity')
   const distance = watch('distance')
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      const items = await getMenuItems(tabValue === 0 ? 'chai' : 'food')
+      setMenuItems(items)
+      setLoading(false)
+    }
+
+    fetchMenuItems()
+  }, [tabValue])
+
+  if (loading) {
+    return <LoadingSpinner />
+  }
 
   const calculateTotal = (quantity: number, distance?: number) => {
     let total = quantity * PRICE_PER_CUP
@@ -118,21 +134,23 @@ const Order = () => {
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <Controller
-                  name="chaiType"
+                  name="menuItem"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <FormControl fullWidth required>
-                      <InputLabel id="chai-type-label-delivery">Chai Type</InputLabel>
+                    <FormControl fullWidth required sx={{ mb: 3 }}>
+                      <InputLabel id="menu-item-label">Menu Item</InputLabel>
                       <Select
-                        {...field}
-                        labelId="chai-type-label-delivery"
-                        id="chai-type-select-delivery"
-                        label="Chai Type"
+                        labelId="menu-item-label"
+                        id="menu-item"
+                        value={field.value}
+                        label="Menu Item"
+                        onChange={(e) => field.onChange(e.target.value)}
+                        required
                       >
-                        {chaiTypes.map((type) => (
-                          <MenuItem key={type} value={type}>
-                            {type}
+                        {menuItems.map((item) => (
+                          <MenuItem key={item.id} value={item.id}>
+                            {item.name} - ${item.price.toFixed(2)}
                           </MenuItem>
                         ))}
                       </Select>
@@ -154,7 +172,7 @@ const Order = () => {
                         id="quantity-select-delivery"
                         label="Number of Cups"
                       >
-                        {chaiOptions.map((option) => (
+                        {[16, 32, 50, 66, 82, 100].map((option) => (
                           <MenuItem key={option} value={option}>
                             {option} cups
                           </MenuItem>
@@ -202,21 +220,23 @@ const Order = () => {
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <Controller
-                  name="chaiType"
+                  name="menuItem"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <FormControl fullWidth required>
-                      <InputLabel id="chai-type-label-cart">Chai Type</InputLabel>
+                    <FormControl fullWidth required sx={{ mb: 3 }}>
+                      <InputLabel id="menu-item-label">Menu Item</InputLabel>
                       <Select
-                        {...field}
-                        labelId="chai-type-label-cart"
-                        id="chai-type-select-cart"
-                        label="Chai Type"
+                        labelId="menu-item-label"
+                        id="menu-item"
+                        value={field.value}
+                        label="Menu Item"
+                        onChange={(e) => field.onChange(e.target.value)}
+                        required
                       >
-                        {chaiTypes.map((type) => (
-                          <MenuItem key={type} value={type}>
-                            {type}
+                        {menuItems.map((item) => (
+                          <MenuItem key={item.id} value={item.id}>
+                            {item.name} - ${item.price.toFixed(2)}
                           </MenuItem>
                         ))}
                       </Select>
@@ -238,7 +258,7 @@ const Order = () => {
                         id="quantity-select-cart"
                         label="Number of Cups"
                       >
-                        {chaiOptions.map((option) => (
+                        {[16, 32, 50, 66, 82, 100].map((option) => (
                           <MenuItem key={option} value={option}>
                             {option} cups
                           </MenuItem>

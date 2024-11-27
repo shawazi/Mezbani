@@ -1,0 +1,19 @@
+{
+  "name": "mezbani-scripts",
+  "version": "1.0.0",
+  "description": "Database initialization scripts for Mezbani",
+  "main": "init-db.ts",
+  "type": "module",
+  "scripts": {
+    "init-db": "node --loader ts-node/esm init-db.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "firebase-admin": "^11.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
