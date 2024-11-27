@@ -302,7 +302,7 @@ const Order = () => {
 
         <form onSubmit={handleDeliverySubmit} noValidate autoComplete="on">
           <TabPanel value={tabValue} index={0}>
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
               <Grid item xs={12} md={6}>
                 <Typography variant="h4" gutterBottom sx={{ color: bangladeshGreen }}>
                   Chai Selection
@@ -381,38 +381,6 @@ const Order = () => {
                     Add Another Chai
                   </Button>
                 </Grid>
-                <Grid item xs={12} sx={{ px: 3 }}>
-                  <TextField
-                    fullWidth
-                    label="Zip Code"
-                    type="text"
-                    onChange={handleZipCodeChange}
-                    error={!!zipError}
-                    helperText={zipError}
-                    inputProps={{ 
-                      maxLength: 5,
-                      pattern: "[0-9]*",
-                      'aria-label': 'Zip Code',
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sx={{ px: 3 }}>
-                  <TextField
-                    fullWidth
-                    label="Distance from Watertown, MA (miles)"
-                    type="number"
-                    {...chaiDeliveryForm.register('distance')}
-                    InputLabelProps={{ 
-                      shrink: true
-                    }}
-                    InputProps={{ 
-                      readOnly: true,
-                      inputProps: { 
-                        'aria-label': 'Distance in miles',
-                      }
-                    }}
-                  />
-                </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}>
@@ -488,6 +456,46 @@ const Order = () => {
                   </Button>
                 </Grid>
               </Grid>
+
+              <Grid item xs={12}>
+                <Typography variant="h4" gutterBottom sx={{ color: 'text.primary' }}>
+                  Delivery Information
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6} sx={{ px: 3 }}>
+                    <TextField
+                      fullWidth
+                      label="Zip Code"
+                      type="text"
+                      onChange={handleZipCodeChange}
+                      error={!!zipError}
+                      helperText={zipError}
+                      inputProps={{ 
+                        maxLength: 5,
+                        pattern: "[0-9]*",
+                        'aria-label': 'Zip Code',
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} sx={{ px: 3 }}>
+                    <TextField
+                      fullWidth
+                      label="Distance from Watertown, MA (miles)"
+                      type="number"
+                      {...chaiDeliveryForm.register('distance')}
+                      InputLabelProps={{ 
+                        shrink: true
+                      }}
+                      InputProps={{ 
+                        readOnly: true,
+                        inputProps: { 
+                          'aria-label': 'Distance in miles',
+                        }
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
             </Grid>
 
             <Box sx={{ p: 3, textAlign: 'right' }}>
@@ -523,7 +531,7 @@ const Order = () => {
 
         <form onSubmit={handleCartSubmit} noValidate autoComplete="on">
           <TabPanel value={tabValue} index={1}>
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
               <Grid item xs={12} md={6}>
                 <Typography variant="h4" gutterBottom sx={{ color: bangladeshGreen }}>
                   Chai Cart Selection
@@ -602,38 +610,6 @@ const Order = () => {
                     Add Another Chai
                   </Button>
                 </Grid>
-                <Grid item xs={12} sx={{ px: 3 }}>
-                  <TextField
-                    fullWidth
-                    label="Zip Code"
-                    type="text"
-                    onChange={handleCartZipCodeChange}
-                    error={!!cartZipError}
-                    helperText={cartZipError}
-                    inputProps={{ 
-                      maxLength: 5,
-                      pattern: "[0-9]*",
-                      'aria-label': 'Zip Code',
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sx={{ px: 3 }}>
-                  <TextField
-                    fullWidth
-                    label="Distance from Watertown, MA (miles)"
-                    type="number"
-                    {...chaiCartForm.register('distance')}
-                    InputLabelProps={{ 
-                      shrink: true
-                    }}
-                    InputProps={{ 
-                      readOnly: true,
-                      inputProps: { 
-                        'aria-label': 'Distance in miles',
-                      }
-                    }}
-                  />
-                </Grid>
               </Grid>
 
               <Grid item xs={12} md={6}>
@@ -707,6 +683,46 @@ const Order = () => {
                   >
                     Add Another Food Item
                   </Button>
+                </Grid>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography variant="h4" gutterBottom sx={{ color: 'text.primary' }}>
+                  Delivery Information
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6} sx={{ px: 3 }}>
+                    <TextField
+                      fullWidth
+                      label="Zip Code"
+                      type="text"
+                      onChange={handleCartZipCodeChange}
+                      error={!!cartZipError}
+                      helperText={cartZipError}
+                      inputProps={{ 
+                        maxLength: 5,
+                        pattern: "[0-9]*",
+                        'aria-label': 'Zip Code',
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} sx={{ px: 3 }}>
+                    <TextField
+                      fullWidth
+                      label="Distance from Watertown, MA (miles)"
+                      type="number"
+                      {...chaiCartForm.register('distance')}
+                      InputLabelProps={{ 
+                        shrink: true
+                      }}
+                      InputProps={{ 
+                        readOnly: true,
+                        inputProps: { 
+                          'aria-label': 'Distance in miles',
+                        }
+                      }}
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
