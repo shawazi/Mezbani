@@ -3,12 +3,11 @@ interface ZipCodeCoordinates {
   lng: number;
 }
 
-interface ZipCodeResponse {
-  zip_code: string;
-  lat: number;
-  lng: number;
-  city: string;
-  state: string;
+interface ZipCodeApiResponse {
+  places: Array<{
+    latitude: string;
+    longitude: string;
+  }>;
 }
 
 const WATERTOWN_ZIP = "02472";
@@ -28,13 +27,20 @@ async function getZipCodeCoordinates(zipCode: string): Promise<ZipCodeCoordinate
       throw new ZipCodeError(`Invalid ZIP code: ${zipCode}`);
     }
     
-    const data = await response.json();
+    const data = (await response.json()) as ZipCodeApiResponse;
+    if (!data.places?.[0]) {
+      throw new ZipCodeError(`No location data found for ZIP code: ${zipCode}`);
+    }
+
     return {
       lat: parseFloat(data.places[0].latitude),
       lng: parseFloat(data.places[0].longitude)
     };
   } catch (error) {
-    throw new ZipCodeError(`Error fetching ZIP code data: ${error.message}`);
+    if (error instanceof ZipCodeError) {
+      throw error;
+    }
+    throw new ZipCodeError(`Error fetching ZIP code data: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -66,6 +72,9 @@ export async function calculateDistanceFromWatertown(zipCode: string): Promise<n
     
     return calculateDistance(watertownCoords, destinationCoords);
   } catch (error) {
-    throw new ZipCodeError(error.message);
+    if (error instanceof ZipCodeError) {
+      throw error;
+    }
+    throw new ZipCodeError(error instanceof Error ? error.message : 'Unknown error');
   }
 }

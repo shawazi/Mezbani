@@ -121,8 +121,10 @@ const Order = () => {
         const distance = await calculateDistanceFromWatertown(zipCode);
         chaiDeliveryForm.setValue('distance', distance);
         void updateDeliveryTotal();
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof ZipCodeError) {
+          setZipError(error.message);
+        } else if (error instanceof Error) {
           setZipError(error.message);
         } else {
           setZipError('Error calculating distance');
@@ -144,8 +146,10 @@ const Order = () => {
         const distance = await calculateDistanceFromWatertown(zipCode);
         chaiCartForm.setValue('distance', distance);
         void updateCartTotal();
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof ZipCodeError) {
+          setCartZipError(error.message);
+        } else if (error instanceof Error) {
           setCartZipError(error.message);
         } else {
           setCartZipError('Error calculating distance');
