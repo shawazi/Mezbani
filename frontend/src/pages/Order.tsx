@@ -166,30 +166,39 @@ const Order = () => {
     fetchMenuItems()
   }, [])
 
+  // Extract watched values for delivery
+  const watchedDeliveryChaiItems = chaiDeliveryForm.watch('chaiItems')
+  const watchedDeliveryFoodItems = chaiDeliveryForm.watch('foodItems')
+  const watchedDeliveryZipCode = chaiDeliveryForm.watch('zipCode')
+
   useEffect(() => {
     const updateDeliveryTotal = async () => {
       const total = await calculateTotal(
-        chaiDeliveryForm.watch('chaiItems') ?? [],
-        chaiDeliveryForm.watch('foodItems') ?? [],
-        chaiDeliveryForm.watch('zipCode')
+        watchedDeliveryChaiItems ?? [],
+        watchedDeliveryFoodItems ?? [],
+        watchedDeliveryZipCode
       )
       setDeliveryTotal(total.toFixed(2))
     }
 
     updateDeliveryTotal()
-  }, [chaiDeliveryForm.watch('chaiItems'), chaiDeliveryForm.watch('foodItems'), chaiDeliveryForm.watch('zipCode')])
+  }, [watchedDeliveryChaiItems, watchedDeliveryFoodItems, watchedDeliveryZipCode, calculateTotal])
+
+  // Extract watched values for cart
+  const watchedCartChaiItems = chaiCartForm.watch('chaiItems')
+  const watchedCartFoodItems = chaiCartForm.watch('foodItems')
 
   useEffect(() => {
     const updateCartTotal = async () => {
       const total = await calculateTotal(
-        chaiCartForm.watch('chaiItems') ?? [],
-        chaiCartForm.watch('foodItems') ?? []
+        watchedCartChaiItems ?? [],
+        watchedCartFoodItems ?? []
       )
       setCartTotal(total.toFixed(2))
     }
 
     updateCartTotal()
-  }, [chaiCartForm.watch('chaiItems'), chaiCartForm.watch('foodItems')])
+  }, [watchedCartChaiItems, watchedCartFoodItems, calculateTotal])
 
   if (loading) {
     return <LoadingSpinner />
