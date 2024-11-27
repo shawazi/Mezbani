@@ -8,7 +8,12 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    historyApiFallback: true,
+    proxy: {
+      '/api': 'http://localhost:3000'
+    }
+  },
+  preview: {
+    port: 3000
   },
   build: {
     outDir: 'dist',

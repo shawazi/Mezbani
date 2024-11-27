@@ -87,7 +87,7 @@ const Order = () => {
 
   return (
     <Container maxWidth="md">
-      <Typography variant="h4" align="center" gutterBottom>
+      <Typography variant="h4" component="h1" align="center" gutterBottom>
         Place Your Order
       </Typography>
       <Paper elevation={3} sx={{ mt: 4 }}>
@@ -98,12 +98,13 @@ const Order = () => {
           sx={{
             '& .MuiTabs-indicator': { backgroundColor: bangladeshRed },
           }}
+          aria-label="Order type tabs"
         >
-          <Tab label="Chai Delivery" />
-          <Tab label="Chai Cart" />
+          <Tab label="Chai Delivery" id="order-tab-0" aria-controls="order-tabpanel-0" />
+          <Tab label="Chai Cart" id="order-tab-1" aria-controls="order-tabpanel-1" />
         </Tabs>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="on">
           <TabPanel value={tabValue} index={0}>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
@@ -112,9 +113,14 @@ const Order = () => {
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <FormControl fullWidth>
-                      <InputLabel>Chai Type</InputLabel>
-                      <Select {...field} label="Chai Type">
+                    <FormControl fullWidth required>
+                      <InputLabel id="chai-type-label-delivery">Chai Type</InputLabel>
+                      <Select
+                        {...field}
+                        labelId="chai-type-label-delivery"
+                        id="chai-type-select-delivery"
+                        label="Chai Type"
+                      >
                         {chaiTypes.map((type) => (
                           <MenuItem key={type} value={type}>
                             {type}
@@ -131,9 +137,14 @@ const Order = () => {
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <FormControl fullWidth>
-                      <InputLabel>Number of Cups</InputLabel>
-                      <Select {...field} label="Number of Cups">
+                    <FormControl fullWidth required>
+                      <InputLabel id="quantity-label-delivery">Number of Cups</InputLabel>
+                      <Select
+                        {...field}
+                        labelId="quantity-label-delivery"
+                        id="quantity-select-delivery"
+                        label="Number of Cups"
+                      >
                         {chaiOptions.map((option) => (
                           <MenuItem key={option} value={option}>
                             {option} cups
@@ -154,16 +165,22 @@ const Order = () => {
                       fullWidth
                       label="Distance from Watertown, MA (miles)"
                       type="number"
-                      InputProps={{ inputProps: { min: 0 } }}
+                      InputProps={{ 
+                        inputProps: { 
+                          min: 0,
+                          'aria-label': 'Distance in miles',
+                        }
+                      }}
+                      id="distance-input"
                     />
                   )}
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" component="div" gutterBottom>
                   Total: ${calculateTotal(quantity, distance || 0).toFixed(2)}
                   {distance && distance > DELIVERY_THRESHOLD && (
-                    <Typography variant="caption" color="error" display="block">
+                    <Typography variant="caption" color="error" component="div" display="block">
                       * Includes ${ADDITIONAL_FEE} delivery fee for distance over {DELIVERY_THRESHOLD} miles
                     </Typography>
                   )}
@@ -180,9 +197,14 @@ const Order = () => {
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <FormControl fullWidth>
-                      <InputLabel>Chai Type</InputLabel>
-                      <Select {...field} label="Chai Type">
+                    <FormControl fullWidth required>
+                      <InputLabel id="chai-type-label-cart">Chai Type</InputLabel>
+                      <Select
+                        {...field}
+                        labelId="chai-type-label-cart"
+                        id="chai-type-select-cart"
+                        label="Chai Type"
+                      >
                         {chaiTypes.map((type) => (
                           <MenuItem key={type} value={type}>
                             {type}
@@ -199,9 +221,14 @@ const Order = () => {
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <FormControl fullWidth>
-                      <InputLabel>Number of Cups</InputLabel>
-                      <Select {...field} label="Number of Cups">
+                    <FormControl fullWidth required>
+                      <InputLabel id="quantity-label-cart">Number of Cups</InputLabel>
+                      <Select
+                        {...field}
+                        labelId="quantity-label-cart"
+                        id="quantity-select-cart"
+                        label="Number of Cups"
+                      >
                         {chaiOptions.map((option) => (
                           <MenuItem key={option} value={option}>
                             {option} cups
@@ -213,7 +240,7 @@ const Order = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" component="div" gutterBottom>
                   Total: ${calculateTotal(quantity).toFixed(2)}
                 </Typography>
               </Grid>
@@ -221,7 +248,7 @@ const Order = () => {
           </TabPanel>
 
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" component="h2" gutterBottom>
               Contact Information
             </Typography>
             <Grid container spacing={3}>
@@ -231,7 +258,14 @@ const Order = () => {
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth label="Name" required />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Name"
+                      required
+                      id="name-input"
+                      autoComplete="name"
+                    />
                   )}
                 />
               </Grid>
@@ -241,7 +275,15 @@ const Order = () => {
                   control={control}
                   rules={{ required: true, pattern: /^\S+@\S+$/i }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth label="Email" required type="email" />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Email"
+                      required
+                      type="email"
+                      id="email-input"
+                      autoComplete="email"
+                    />
                   )}
                 />
               </Grid>
@@ -251,7 +293,15 @@ const Order = () => {
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <TextField {...field} fullWidth label="Phone" required />
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Phone"
+                      required
+                      type="tel"
+                      id="phone-input"
+                      autoComplete="tel"
+                    />
                   )}
                 />
               </Grid>
@@ -262,7 +312,14 @@ const Order = () => {
                     control={control}
                     rules={{ required: true }}
                     render={({ field }) => (
-                      <TextField {...field} fullWidth label="Delivery Address" required />
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Delivery Address"
+                        required
+                        id="address-input"
+                        autoComplete="street-address"
+                      />
                     )}
                   />
                 </Grid>

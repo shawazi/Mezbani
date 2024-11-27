@@ -9,9 +9,15 @@ export const theme = createTheme({
     mode: 'dark',
     primary: {
       main: bangladeshGreen,
+      light: '#338d6f',
+      dark: '#004a37',
+      contrastText: '#ffffff',
     },
     secondary: {
       main: bangladeshRed,
+      light: '#f65464',
+      dark: '#aa1d2d',
+      contrastText: '#ffffff',
     },
     background: {
       default: '#121212',
@@ -23,20 +29,28 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
+    fontFamily: "'Montserrat', sans-serif",
     h1: {
       fontWeight: 700,
     },
     h2: {
       fontWeight: 600,
+    },
+    h3: {
+      fontWeight: 600,
+    },
+    h4: {
+      fontWeight: 600,
+    },
+    h5: {
+      fontWeight: 500,
+    },
+    h6: {
+      fontWeight: 500,
+    },
+    button: {
+      fontWeight: 600,
+      textTransform: 'none',
     },
   },
   components: {

@@ -1,5 +1,5 @@
-import { ReactNode, useState } from 'react'
-import { Link as RouterLink, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { Link as RouterLink, useLocation, Outlet } from 'react-router-dom'
 import {
   AppBar,
   Toolbar,
@@ -18,10 +18,6 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import { bangladeshGreen } from '../theme'
 
-interface LayoutProps {
-  children: ReactNode
-}
-
 const navItems = [
   { label: 'Home', path: '/' },
   { label: 'Menu', path: '/menu' },
@@ -31,7 +27,7 @@ const navItems = [
   { label: 'Order', path: '/order' },
 ]
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -48,7 +44,7 @@ const Layout = ({ children }: LayoutProps) => {
           key={item.path}
           disablePadding
           sx={{
-            color: 'white',
+            color: 'black',
             '&.Mui-selected': {
               backgroundColor: 'rgba(0, 106, 78, 0.2)',
             },
@@ -66,7 +62,7 @@ const Layout = ({ children }: LayoutProps) => {
               justifyContent: 'flex-start',
               px: 3,
               py: 1.5,
-              color: 'inherit',
+              color: 'black',
               textAlign: 'left',
               '&.Mui-selected': {
                 backgroundColor: 'rgba(0, 106, 78, 0.2)',
@@ -108,7 +104,7 @@ const Layout = ({ children }: LayoutProps) => {
               to="/"
               sx={{
                 textDecoration: 'none',
-                color: 'white',
+                color: 'black',
                 fontWeight: 'bold',
                 fontSize: { xs: '1.2rem', sm: '1.5rem' },
               }}
@@ -122,6 +118,7 @@ const Layout = ({ children }: LayoutProps) => {
                 aria-label="open drawer"
                 edge="end"
                 onClick={handleDrawerToggle}
+                sx={{ color: 'black' }}
               >
                 <MenuIcon />
               </IconButton>
@@ -139,7 +136,7 @@ const Layout = ({ children }: LayoutProps) => {
                     component={RouterLink}
                     to={item.path}
                     sx={{
-                      color: 'white',
+                      color: 'black',
                       opacity: location.pathname === item.path ? 1 : 0.8,
                       '&:hover': {
                         opacity: 1,
@@ -177,7 +174,7 @@ const Layout = ({ children }: LayoutProps) => {
       </Drawer>
 
       <Box component="main" sx={{ flexGrow: 1, width: '100%' }}>
-        {children}
+        <Outlet />
       </Box>
 
       <Box

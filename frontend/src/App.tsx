@@ -15,16 +15,16 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/faqs" element={<FAQs />} />
-            <Route path="/order" element={<Order />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="menu" element={<Menu />} />
+            <Route path="events" element={<Events />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="faqs" element={<FAQs />} />
+            <Route path="order" element={<Order />} />
+          </Route>
+        </Routes>
       </Router>
     </ThemeProvider>
   )
