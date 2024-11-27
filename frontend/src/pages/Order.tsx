@@ -11,12 +11,12 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
+  MenuItem as MuiMenuItem,
   Grid,
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { bangladeshGreen, bangladeshRed } from '../theme'
-import { getMenuItems } from '../lib/firebase/firestore'
+import { getMenuItems, MenuItem } from '../lib/firebase/firestore'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 interface TabPanelProps {
@@ -57,7 +57,7 @@ interface OrderFormData {
 
 const Order = () => {
   const [tabValue, setTabValue] = useState(0)
-  const [menuItems, setMenuItems] = useState<any[]>([])
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
   const { control, watch, handleSubmit } = useForm<OrderFormData>({
     defaultValues: {
@@ -149,9 +149,9 @@ const Order = () => {
                         required
                       >
                         {menuItems.map((item) => (
-                          <MenuItem key={item.id} value={item.id}>
+                          <MuiMenuItem key={item.id} value={item.id}>
                             {item.name} - ${item.price.toFixed(2)}
-                          </MenuItem>
+                          </MuiMenuItem>
                         ))}
                       </Select>
                     </FormControl>
@@ -173,9 +173,9 @@ const Order = () => {
                         label="Number of Cups"
                       >
                         {[16, 32, 50, 66, 82, 100].map((option) => (
-                          <MenuItem key={option} value={option}>
+                          <MuiMenuItem key={option} value={option}>
                             {option} cups
-                          </MenuItem>
+                          </MuiMenuItem>
                         ))}
                       </Select>
                     </FormControl>
@@ -235,9 +235,9 @@ const Order = () => {
                         required
                       >
                         {menuItems.map((item) => (
-                          <MenuItem key={item.id} value={item.id}>
+                          <MuiMenuItem key={item.id} value={item.id}>
                             {item.name} - ${item.price.toFixed(2)}
-                          </MenuItem>
+                          </MuiMenuItem>
                         ))}
                       </Select>
                     </FormControl>
@@ -259,9 +259,9 @@ const Order = () => {
                         label="Number of Cups"
                       >
                         {[16, 32, 50, 66, 82, 100].map((option) => (
-                          <MenuItem key={option} value={option}>
+                          <MuiMenuItem key={option} value={option}>
                             {option} cups
-                          </MenuItem>
+                          </MuiMenuItem>
                         ))}
                       </Select>
                     </FormControl>
