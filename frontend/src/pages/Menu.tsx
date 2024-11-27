@@ -1,11 +1,11 @@
 import {
   Container,
   Typography,
-  Grid,
+  Box,
   Card,
   CardContent,
   CardMedia,
-  Box,
+  Grid,
 } from '@mui/material'
 import { bangladeshGreen, bangladeshRed } from '../theme'
 
@@ -49,11 +49,12 @@ const menuItems = [
 
 const Menu = () => {
   return (
-    <Container>
+    <Container maxWidth="lg">
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography
-          variant="h3"
+          variant="h1"
           component="h1"
+          align="center"
           gutterBottom
           sx={{ color: bangladeshGreen }}
         >
@@ -72,6 +73,7 @@ const Menu = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
+                bgcolor: 'background.paper',
                 transition: '0.3s',
                 '&:hover': {
                   transform: 'translateY(-5px)',

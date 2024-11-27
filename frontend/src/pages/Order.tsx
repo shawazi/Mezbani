@@ -86,8 +86,8 @@ const Order = () => {
   }
 
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" component="h1" align="center" gutterBottom>
+    <Container maxWidth="lg">
+      <Typography variant="h1" component="h1" align="center" gutterBottom>
         Place Your Order
       </Typography>
       <Paper elevation={3} sx={{ mt: 4 }}>

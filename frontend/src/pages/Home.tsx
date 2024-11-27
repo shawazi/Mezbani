@@ -2,12 +2,12 @@ import {
   Container,
   Typography,
   Box,
-  Grid,
   Paper,
   Button,
+  Grid,
 } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
-import {  bangladeshRed } from '../theme'
+import { bangladeshRed } from '../theme'
 
 const Home = () => {
   return (
@@ -20,8 +20,9 @@ const Home = () => {
         <Container maxWidth="lg" sx={{ mx: 'auto' }}>
           <Box sx={{ textAlign: 'center' }}>
             <Typography
-              variant="h2"
+              variant="h1"
               component="h1"
+              align="center"
               gutterBottom
               sx={{ 
                 color: 'white',
@@ -29,13 +30,13 @@ const Home = () => {
                 fontSize: { xs: '2.5rem', sm: '3.75rem' }
               }}
             >
-              Welcome to Mezbani Chai House
+              Mezbani Chai House
             </Typography>
             <Typography 
-              variant="h5" 
-              color="text.secondary" 
-              paragraph
+              component="p" 
               sx={{ 
+                color: 'text.secondary',
+                mb: 4,
                 fontSize: { xs: '1.1rem', sm: '1.5rem' },
                 maxWidth: '800px',
                 mx: 'auto',
@@ -85,7 +86,7 @@ const Home = () => {
               <Typography variant="h5" gutterBottom color="white">
                 Our Story
               </Typography>
-              <Typography color="text.secondary">
+              <Typography component="p" color="text.secondary">
                 Founded with a passion for authentic Bangladeshi chai, Mezbani brings
                 the rich tradition of tea culture to Watertown, MA. Every cup tells a
                 story of heritage and craftsmanship.
@@ -108,7 +109,7 @@ const Home = () => {
               <Typography variant="h5" gutterBottom color="white">
                 Special Events
               </Typography>
-              <Typography color="text.secondary">
+              <Typography component="p" color="text.secondary">
                 Host your next gathering with us! From corporate events to intimate
                 celebrations, we offer chai catering services that will make your
                 event memorable.
@@ -131,7 +132,7 @@ const Home = () => {
               <Typography variant="h5" gutterBottom color="white">
                 Our Commitment
               </Typography>
-              <Typography color="text.secondary">
+              <Typography component="p" color="text.secondary">
                 We source the finest ingredients and blend them with care to create
                 the perfect cup of chai. Our commitment to quality and authenticity
                 is unwavering.

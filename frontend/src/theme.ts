@@ -29,24 +29,42 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: "'Montserrat', sans-serif",
+    fontFamily: '"Montserrat", sans-serif',
     h1: {
-      fontWeight: 700,
+      fontFamily: '"Playfair Display", serif',
+      fontWeight: 600,
+      marginBottom: '1.5rem',
+      marginTop: '2rem'
     },
     h2: {
+      fontFamily: '"Playfair Display", serif',
       fontWeight: 600,
+      marginBottom: '1.25rem',
+      marginTop: '1.75rem'
     },
     h3: {
-      fontWeight: 600,
+      fontFamily: '"Playfair Display", serif',
+      fontWeight: 500,
+      marginBottom: '1rem',
+      marginTop: '1.5rem'
     },
     h4: {
-      fontWeight: 600,
+      fontFamily: '"Playfair Display", serif',
+      fontWeight: 500,
+      marginBottom: '0.75rem',
+      marginTop: '1.25rem'
     },
     h5: {
+      fontFamily: '"Playfair Display", serif',
       fontWeight: 500,
+      marginBottom: '0.5rem',
+      marginTop: '1rem'
     },
     h6: {
+      fontFamily: '"Playfair Display", serif',
       fontWeight: 500,
+      marginBottom: '0.5rem',
+      marginTop: '1rem'
     },
     button: {
       fontWeight: 600,
@@ -68,5 +86,20 @@ export const theme = createTheme({
         },
       },
     },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          paddingTop: '2rem',
+          paddingBottom: '2rem'
+        }
+      }
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: bangladeshGreen
+        }
+      }
+    }
   },
 });
