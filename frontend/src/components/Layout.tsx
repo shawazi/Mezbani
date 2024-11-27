@@ -81,12 +81,13 @@ const Layout = () => {
       display: 'flex', 
       flexDirection: 'column', 
       minHeight: '100vh', 
-      width: '100vw', 
-      maxWidth: '100%', 
+      width: '100%', 
+      maxWidth: '100%',
       margin: 0, 
       padding: 0,
       bgcolor: 'background.default',
       color: 'text.primary',
+      overflowX: 'hidden',
     }}>
       <AppBar 
         position="sticky" 
@@ -96,8 +97,15 @@ const Layout = () => {
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         }}
       >
-        <Container maxWidth="lg" sx={{ width: '100%' }}>
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+        <Container maxWidth="lg" sx={{ width: '100%', px: { xs: 2, sm: 3 } }}>
+          <Toolbar 
+            disableGutters 
+            sx={{ 
+              justifyContent: 'space-between',
+              minHeight: { xs: '56px', sm: '64px' }, 
+              py: { xs: 0.5, sm: 0.75 } 
+            }}
+          >
             <Typography
               variant="h6"
               component={RouterLink}
@@ -138,6 +146,9 @@ const Layout = () => {
                     sx={{
                       color: 'black',
                       opacity: location.pathname === item.path ? 1 : 0.8,
+                      fontSize: { sm: '1rem', md: '1.1rem' }, 
+                      textTransform: 'none', 
+                      py: 0.5, 
                       '&:hover': {
                         opacity: 1,
                         backgroundColor: 'rgba(255, 255, 255, 0.1)',
