@@ -256,6 +256,26 @@ const Order = () => {
     name: 'foodItems',
   })
 
+  const removeChaiDeliveryItemHandler = (index: number) => {
+    removeChaiDeliveryItem(index);
+    void updateDeliveryTotal();
+  };
+
+  const removeFoodDeliveryItemHandler = (index: number) => {
+    removeFoodDeliveryItem(index);
+    void updateDeliveryTotal();
+  };
+
+  const removeChaiCartItemHandler = (index: number) => {
+    removeChaiCartItem(index);
+    void updateCartTotal();
+  };
+
+  const removeFoodCartItemHandler = (index: number) => {
+    removeFoodCartItem(index);
+    void updateCartTotal();
+  };
+
   useEffect(() => {
     const fetchMenuItems = async () => {
       const chaiItems = await getMenuItems('chai')
@@ -363,9 +383,9 @@ const Order = () => {
                     </Grid>
                     <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
                       <IconButton 
-                        onClick={() => removeChaiDeliveryItem(index)}
-                        color="error"
-                        aria-label="Delete item"
+                        aria-label="delete"
+                        onClick={() => removeChaiDeliveryItemHandler(index)}
+                        sx={{ color: 'error.main' }}
                       >
                         <Delete />
                       </IconButton>
@@ -437,9 +457,9 @@ const Order = () => {
                     </Grid>
                     <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
                       <IconButton 
-                        onClick={() => removeFoodDeliveryItem(index)}
-                        color="error"
-                        aria-label="Delete item"
+                        aria-label="delete"
+                        onClick={() => removeFoodDeliveryItemHandler(index)}
+                        sx={{ color: 'error.main' }}
                       >
                         <Delete />
                       </IconButton>
@@ -592,9 +612,9 @@ const Order = () => {
                     </Grid>
                     <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
                       <IconButton 
-                        onClick={() => removeChaiCartItem(index)}
-                        color="error"
-                        aria-label="Delete item"
+                        aria-label="delete"
+                        onClick={() => removeChaiCartItemHandler(index)}
+                        sx={{ color: 'error.main' }}
                       >
                         <Delete />
                       </IconButton>
@@ -666,9 +686,9 @@ const Order = () => {
                     </Grid>
                     <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
                       <IconButton 
-                        onClick={() => removeFoodCartItem(index)}
-                        color="error"
-                        aria-label="Delete item"
+                        aria-label="delete"
+                        onClick={() => removeFoodCartItemHandler(index)}
+                        sx={{ color: 'error.main' }}
                       >
                         <Delete />
                       </IconButton>
