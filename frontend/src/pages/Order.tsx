@@ -11,12 +11,14 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem as MuiMenuItem,
+  MenuItem,
   Grid,
+  IconButton,
 } from '@mui/material'
-import { useForm, Controller } from 'react-hook-form'
+import { Add, Delete } from '@mui/icons-material'
+import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { bangladeshGreen, bangladeshRed } from '../theme'
-import { getMenuItems, MenuItem } from '../lib/firebase/firestore'
+import { getMenuItems, MenuItem as MenuItemType } from '../lib/firebase/firestore'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 interface TabPanelProps {
@@ -43,11 +45,15 @@ const TabPanel = (props: TabPanelProps) => {
 
 const DELIVERY_THRESHOLD = 30 // miles
 const ADDITIONAL_FEE = 25 // dollars
-const PRICE_PER_CUP = 3.5
+
+interface OrderItem {
+  id: string
+  quantity: number
+}
 
 interface OrderFormData {
-  menuItem: string
-  quantity: number
+  chaiItems: OrderItem[]
+  foodItems: OrderItem[]
   distance?: number
   name: string
   email: string
@@ -57,12 +63,16 @@ interface OrderFormData {
 
 const Order = () => {
   const [tabValue, setTabValue] = useState(0)
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [menuItems, setMenuItems] = useState<{
+    chai: MenuItemType[]
+    food: MenuItemType[]
+  }>({ chai: [], food: [] })
   const [loading, setLoading] = useState(true)
-  const { control, watch, handleSubmit } = useForm<OrderFormData>({
+
+  const chaiDeliveryForm = useForm<OrderFormData>({
     defaultValues: {
-      menuItem: '',
-      quantity: 16,
+      chaiItems: [{ id: '', quantity: 16 }],
+      foodItems: [{ id: '', quantity: 1 }],
       distance: 0,
       name: '',
       email: '',
@@ -71,34 +81,80 @@ const Order = () => {
     },
   })
 
-  const quantity = watch('quantity')
-  const distance = watch('distance')
+  const chaiCartForm = useForm<OrderFormData>({
+    defaultValues: {
+      chaiItems: [{ id: '', quantity: 16 }],
+      foodItems: [{ id: '', quantity: 1 }],
+    },
+  })
+
+  const handleDeliverySubmit = chaiDeliveryForm.handleSubmit((data) => {
+    console.log(`Delivery Order submitted: ${JSON.stringify(data)}`)
+    // Future integration with SquareUp for delivery
+  })
+
+  const handleCartSubmit = chaiCartForm.handleSubmit((data) => {
+    console.log(`Cart Order submitted: ${JSON.stringify(data)}`)
+    // Future integration with SquareUp for cart
+  })
+
+  const calculateTotal = (chaiItems: OrderItem[], foodItems: OrderItem[], distance?: number) => {
+    let total = 0
+
+    chaiItems.forEach(item => {
+      const chaiItem = menuItems.chai.find(chai => chai.id === item.id)
+      if (chaiItem) {
+        total += chaiItem.price * item.quantity
+      }
+    })
+
+    foodItems.forEach(item => {
+      const foodItem = menuItems.food.find(food => food.id === item.id)
+      if (foodItem) {
+        total += foodItem.price * item.quantity
+      }
+    })
+
+    if (distance && distance > DELIVERY_THRESHOLD) {
+      total += ADDITIONAL_FEE
+    }
+
+    return total
+  }
+
+  const { fields: chaiDeliveryFields, append: appendChaiDeliveryItem } = useFieldArray({
+    control: chaiDeliveryForm.control,
+    name: 'chaiItems',
+  })
+
+  const { fields: foodDeliveryFields, append: appendFoodDeliveryItem } = useFieldArray({
+    control: chaiDeliveryForm.control,
+    name: 'foodItems',
+  })
+
+  const { fields: chaiCartFields, append: appendChaiCartItem } = useFieldArray({
+    control: chaiCartForm.control,
+    name: 'chaiItems',
+  })
+
+  const { fields: foodCartFields, append: appendFoodCartItem } = useFieldArray({
+    control: chaiCartForm.control,
+    name: 'foodItems',
+  })
 
   useEffect(() => {
     const fetchMenuItems = async () => {
-      const items = await getMenuItems(tabValue === 0 ? 'chai' : 'food')
-      setMenuItems(items)
+      const chaiItems = await getMenuItems('chai')
+      const foodItems = await getMenuItems('food')
+      setMenuItems({ chai: chaiItems, food: foodItems })
       setLoading(false)
     }
 
     fetchMenuItems()
-  }, [tabValue])
+  }, [])
 
   if (loading) {
     return <LoadingSpinner />
-  }
-
-  const calculateTotal = (quantity: number, distance?: number) => {
-    let total = quantity * PRICE_PER_CUP
-    if (distance && distance > DELIVERY_THRESHOLD) {
-      total += ADDITIONAL_FEE
-    }
-    return total
-  }
-
-  const onSubmit = (data: OrderFormData) => {
-    console.log(`Order submitted: ${JSON.stringify(data)}`)
-    // Here you would typically send the order to your backend
   }
 
   return (
@@ -115,7 +171,8 @@ const Order = () => {
       <Typography variant="h1" component="h1" align="center" gutterBottom>
         Place Your Order
       </Typography>
-      <Paper elevation={3} sx={{ mt: 4 }}>
+
+      <Paper elevation={3} sx={{ mt: 4, width: '100%' }}>
         <Tabs
           value={tabValue}
           onChange={(_, newValue) => setTabValue(newValue)}
@@ -129,248 +186,331 @@ const Order = () => {
           <Tab label="Chai Cart" id="order-tab-1" aria-controls="order-tabpanel-1" />
         </Tabs>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="on">
+        <form onSubmit={handleDeliverySubmit} noValidate autoComplete="on">
           <TabPanel value={tabValue} index={0}>
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="menuItem"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <FormControl fullWidth required sx={{ mb: 3 }}>
-                      <InputLabel id="menu-item-label">Menu Item</InputLabel>
-                      <Select
-                        labelId="menu-item-label"
-                        id="menu-item"
-                        value={field.value}
-                        label="Menu Item"
-                        onChange={(e) => field.onChange(e.target.value)}
-                        required
-                      >
-                        {menuItems.map((item) => (
-                          <MuiMenuItem key={item.id} value={item.id}>
-                            {item.name} - ${item.price.toFixed(2)}
-                          </MuiMenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="quantity"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <FormControl fullWidth required>
-                      <InputLabel id="quantity-label-delivery">Number of Cups</InputLabel>
-                      <Select
-                        {...field}
-                        labelId="quantity-label-delivery"
-                        id="quantity-select-delivery"
-                        label="Number of Cups"
-                      >
-                        {[16, 32, 50, 66, 82, 100].map((option) => (
-                          <MuiMenuItem key={option} value={option}>
-                            {option} cups
-                          </MuiMenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Controller
-                  name="distance"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Distance from Watertown, MA (miles)"
-                      type="number"
-                      InputProps={{ 
-                        inputProps: { 
-                          min: 0,
-                          'aria-label': 'Distance in miles',
-                        }
-                      }}
-                      id="distance-input"
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h6" component="div" gutterBottom>
-                  Total: ${calculateTotal(quantity, distance || 0).toFixed(2)}
-                  {distance && distance > DELIVERY_THRESHOLD && (
-                    <Typography variant="caption" color="error" component="div" display="block">
-                      * Includes ${ADDITIONAL_FEE} delivery fee for distance over {DELIVERY_THRESHOLD} miles
-                    </Typography>
-                  )}
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4" gutterBottom sx={{ color: bangladeshGreen }}>
+                  Chai Selection
                 </Typography>
-              </Grid>
-            </Grid>
-          </TabPanel>
-
-          <TabPanel value={tabValue} index={1}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="menuItem"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <FormControl fullWidth required sx={{ mb: 3 }}>
-                      <InputLabel id="menu-item-label">Menu Item</InputLabel>
-                      <Select
-                        labelId="menu-item-label"
-                        id="menu-item"
-                        value={field.value}
-                        label="Menu Item"
-                        onChange={(e) => field.onChange(e.target.value)}
-                        required
-                      >
-                        {menuItems.map((item) => (
-                          <MuiMenuItem key={item.id} value={item.id}>
-                            {item.name} - ${item.price.toFixed(2)}
-                          </MuiMenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="quantity"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <FormControl fullWidth required>
-                      <InputLabel id="quantity-label-cart">Number of Cups</InputLabel>
-                      <Select
-                        {...field}
-                        labelId="quantity-label-cart"
-                        id="quantity-select-cart"
-                        label="Number of Cups"
-                      >
-                        {[16, 32, 50, 66, 82, 100].map((option) => (
-                          <MuiMenuItem key={option} value={option}>
-                            {option} cups
-                          </MuiMenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h6" component="div" gutterBottom>
-                  Total: ${calculateTotal(quantity).toFixed(2)}
-                </Typography>
-              </Grid>
-            </Grid>
-          </TabPanel>
-
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" component="h2" gutterBottom>
-              Contact Information
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="name"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Name"
-                      required
-                      id="name-input"
-                      autoComplete="name"
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{ required: true, pattern: /^\S+@\S+$/i }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email"
-                      required
-                      type="email"
-                      id="email-input"
-                      autoComplete="email"
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="phone"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Phone"
-                      required
-                      type="tel"
-                      id="phone-input"
-                      autoComplete="tel"
-                    />
-                  )}
-                />
-              </Grid>
-              {tabValue === 0 && (
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="address"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        label="Delivery Address"
-                        required
-                        id="address-input"
-                        autoComplete="street-address"
+                {chaiDeliveryFields.map((field, index) => (
+                  <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
+                    <Grid item xs={8}>
+                      <FormControl fullWidth required>
+                        <InputLabel>Chai Flavor</InputLabel>
+                        <Controller
+                          name={`chaiItems.${index}.id`}
+                          control={chaiDeliveryForm.control}
+                          rules={{ required: true }}
+                          render={({ field: selectField }) => (
+                            <Select
+                              {...selectField}
+                              label="Chai Flavor"
+                            >
+                              {menuItems.chai.map((item) => (
+                                <MenuItem key={item.id} value={item.id}>
+                                  {item.name} - ${item.price.toFixed(2)}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Controller
+                        name={`chaiItems.${index}.quantity`}
+                        control={chaiDeliveryForm.control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <FormControl fullWidth required>
+                            <InputLabel>Cups</InputLabel>
+                            <Select
+                              {...field}
+                              label="Cups"
+                            >
+                              {[16, 32, 50, 66, 82, 100].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option} cups
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
                       />
-                    )}
+                    </Grid>
+                  </Grid>
+                ))}
+                <Grid item xs={12} sx={{ px: 3, mb: 2 }}>
+                  <Button 
+                    startIcon={<Add />} 
+                    onClick={() => appendChaiDeliveryItem({ id: '', quantity: 16 })}
+                    variant="outlined"
+                  >
+                    Add Another Chai
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sx={{ px: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="Distance from Watertown, MA (miles)"
+                    type="number"
+                    {...chaiDeliveryForm.register('distance', { 
+                      min: 0,
+                      valueAsNumber: true 
+                    })}
+                    InputProps={{ 
+                      inputProps: { 
+                        min: 0,
+                        'aria-label': 'Distance in miles',
+                      }
+                    }}
                   />
                 </Grid>
-              )}
-            </Grid>
-          </Box>
+              </Grid>
 
-          <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{
-                backgroundColor: bangladeshGreen,
-                '&:hover': {
-                  backgroundColor: bangladeshRed,
-                },
-              }}
-            >
-              Place Order
-            </Button>
-          </Box>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4" gutterBottom sx={{ color: bangladeshRed }}>
+                  Food Selection
+                </Typography>
+                {foodDeliveryFields.map((field, index) => (
+                  <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
+                    <Grid item xs={8}>
+                      <FormControl fullWidth required>
+                        <InputLabel>Food Item</InputLabel>
+                        <Controller
+                          name={`foodItems.${index}.id`}
+                          control={chaiDeliveryForm.control}
+                          rules={{ required: true }}
+                          render={({ field: selectField }) => (
+                            <Select
+                              {...selectField}
+                              label="Food Item"
+                            >
+                              {menuItems.food.map((item) => (
+                                <MenuItem key={item.id} value={item.id}>
+                                  {item.name} - ${item.price.toFixed(2)}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Controller
+                        name={`foodItems.${index}.quantity`}
+                        control={chaiDeliveryForm.control}
+                        rules={{ 
+                          required: true, 
+                          min: 1, 
+                          max: 100 
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            label="Quantity"
+                            type="number"
+                            inputProps={{ 
+                              min: 1, 
+                              max: 100 
+                            }}
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                ))}
+                <Grid item xs={12} sx={{ px: 3, mb: 2 }}>
+                  <Button 
+                    startIcon={<Add />} 
+                    onClick={() => appendFoodDeliveryItem({ id: '', quantity: 1 })}
+                    variant="outlined"
+                  >
+                    Add Another Food Item
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Box sx={{ p: 3, textAlign: 'right' }}>
+              <Typography variant="h5" gutterBottom>
+                Total: ${calculateTotal(chaiDeliveryForm.watch('chaiItems'), chaiDeliveryForm.watch('foodItems'), chaiDeliveryForm.watch('distance')).toFixed(2)}
+                {chaiDeliveryForm.watch('distance') && chaiDeliveryForm.watch('distance') > DELIVERY_THRESHOLD && (
+                  <Typography variant="caption" color="error" component="div">
+                    * Includes ${ADDITIONAL_FEE} delivery fee
+                  </Typography>
+                )}
+              </Typography>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                sx={{
+                  backgroundColor: bangladeshGreen,
+                  '&:hover': {
+                    backgroundColor: bangladeshRed,
+                  },
+                }}
+              >
+                Place Order
+              </Button>
+            </Box>
+          </TabPanel>
+
+        </form>
+
+        <form onSubmit={handleCartSubmit} noValidate autoComplete="on">
+          <TabPanel value={tabValue} index={1}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4" gutterBottom sx={{ color: bangladeshGreen }}>
+                  Chai Cart Selection
+                </Typography>
+                {chaiCartFields.map((field, index) => (
+                  <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
+                    <Grid item xs={8}>
+                      <FormControl fullWidth required>
+                        <InputLabel>Chai Flavor</InputLabel>
+                        <Controller
+                          name={`chaiItems.${index}.id`}
+                          control={chaiCartForm.control}
+                          rules={{ required: true }}
+                          render={({ field: selectField }) => (
+                            <Select
+                              {...selectField}
+                              label="Chai Flavor"
+                            >
+                              {menuItems.chai.map((item) => (
+                                <MenuItem key={item.id} value={item.id}>
+                                  {item.name} - ${item.price.toFixed(2)}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Controller
+                        name={`chaiItems.${index}.quantity`}
+                        control={chaiCartForm.control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <FormControl fullWidth required>
+                            <InputLabel>Cups</InputLabel>
+                            <Select
+                              {...field}
+                              label="Cups"
+                            >
+                              {[16, 32, 50, 66, 82, 100].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option} cups
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                ))}
+                <Grid item xs={12} sx={{ px: 3, mb: 2 }}>
+                  <Button 
+                    startIcon={<Add />} 
+                    onClick={() => appendChaiCartItem({ id: '', quantity: 16 })}
+                    variant="outlined"
+                  >
+                    Add Another Chai
+                  </Button>
+                </Grid>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4" gutterBottom sx={{ color: bangladeshRed }}>
+                  Food Cart Selection
+                </Typography>
+                {foodCartFields.map((field, index) => (
+                  <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
+                    <Grid item xs={8}>
+                      <FormControl fullWidth required>
+                        <InputLabel>Food Item</InputLabel>
+                        <Controller
+                          name={`foodItems.${index}.id`}
+                          control={chaiCartForm.control}
+                          rules={{ required: true }}
+                          render={({ field: selectField }) => (
+                            <Select
+                              {...selectField}
+                              label="Food Item"
+                            >
+                              {menuItems.food.map((item) => (
+                                <MenuItem key={item.id} value={item.id}>
+                                  {item.name} - ${item.price.toFixed(2)}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Controller
+                        name={`foodItems.${index}.quantity`}
+                        control={chaiCartForm.control}
+                        rules={{ 
+                          required: true, 
+                          min: 1, 
+                          max: 100 
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            label="Quantity"
+                            type="number"
+                            inputProps={{ 
+                              min: 1, 
+                              max: 100 
+                            }}
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                ))}
+                <Grid item xs={12} sx={{ px: 3, mb: 2 }}>
+                  <Button 
+                    startIcon={<Add />} 
+                    onClick={() => appendFoodCartItem({ id: '', quantity: 1 })}
+                    variant="outlined"
+                  >
+                    Add Another Food Item
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Box sx={{ p: 3, textAlign: 'right' }}>
+              <Typography variant="h5" gutterBottom>
+                Total: ${calculateTotal(chaiCartForm.watch('chaiItems'), chaiCartForm.watch('foodItems')).toFixed(2)}
+              </Typography>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                sx={{
+                  backgroundColor: bangladeshGreen,
+                  '&:hover': {
+                    backgroundColor: bangladeshRed,
+                  },
+                }}
+              >
+                Place Order
+              </Button>
+            </Box>
+          </TabPanel>
         </form>
       </Paper>
     </Container>
