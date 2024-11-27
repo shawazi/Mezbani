@@ -12,9 +12,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid
+  Grid,
+  IconButton,
 } from '@mui/material'
-import { Add } from '@mui/icons-material'
+import { Add, Delete } from '@mui/icons-material'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { bangladeshGreen, bangladeshRed } from '../theme'
 import { getMenuItems, MenuItem as MenuItemType } from '../lib/firebase/firestore'
@@ -135,22 +136,22 @@ const Order = () => {
     return total
   }, [menuItems, calculateDistanceFromZip])
 
-  const { fields: chaiDeliveryFields, append: appendChaiDeliveryItem } = useFieldArray({
+  const { fields: chaiDeliveryFields, append: appendChaiDeliveryItem, remove: removeChaiDeliveryItem } = useFieldArray({
     control: chaiDeliveryForm.control,
     name: 'chaiItems',
   })
 
-  const { fields: foodDeliveryFields, append: appendFoodDeliveryItem } = useFieldArray({
+  const { fields: foodDeliveryFields, append: appendFoodDeliveryItem, remove: removeFoodDeliveryItem } = useFieldArray({
     control: chaiDeliveryForm.control,
     name: 'foodItems',
   })
 
-  const { fields: chaiCartFields, append: appendChaiCartItem } = useFieldArray({
+  const { fields: chaiCartFields, append: appendChaiCartItem, remove: removeChaiCartItem } = useFieldArray({
     control: chaiCartForm.control,
     name: 'chaiItems',
   })
 
-  const { fields: foodCartFields, append: appendFoodCartItem } = useFieldArray({
+  const { fields: foodCartFields, append: appendFoodCartItem, remove: removeFoodCartItem } = useFieldArray({
     control: chaiCartForm.control,
     name: 'foodItems',
   })
@@ -166,39 +167,22 @@ const Order = () => {
     fetchMenuItems()
   }, [])
 
-  // Extract watched values for delivery
-  const watchedDeliveryChaiItems = chaiDeliveryForm.watch('chaiItems')
-  const watchedDeliveryFoodItems = chaiDeliveryForm.watch('foodItems')
-  const watchedDeliveryZipCode = chaiDeliveryForm.watch('zipCode')
+  const updateDeliveryTotal = async () => {
+    const total = await calculateTotal(
+      chaiDeliveryForm.getValues('chaiItems') ?? [],
+      chaiDeliveryForm.getValues('foodItems') ?? [],
+      chaiDeliveryForm.getValues('zipCode')
+    )
+    setDeliveryTotal(total.toFixed(2))
+  }
 
-  useEffect(() => {
-    const updateDeliveryTotal = async () => {
-      const total = await calculateTotal(
-        watchedDeliveryChaiItems ?? [],
-        watchedDeliveryFoodItems ?? [],
-        watchedDeliveryZipCode
-      )
-      setDeliveryTotal(total.toFixed(2))
-    }
-
-    updateDeliveryTotal()
-  }, [watchedDeliveryChaiItems, watchedDeliveryFoodItems, watchedDeliveryZipCode, calculateTotal])
-
-  // Extract watched values for cart
-  const watchedCartChaiItems = chaiCartForm.watch('chaiItems')
-  const watchedCartFoodItems = chaiCartForm.watch('foodItems')
-
-  useEffect(() => {
-    const updateCartTotal = async () => {
-      const total = await calculateTotal(
-        watchedCartChaiItems ?? [],
-        watchedCartFoodItems ?? []
-      )
-      setCartTotal(total.toFixed(2))
-    }
-
-    updateCartTotal()
-  }, [watchedCartChaiItems, watchedCartFoodItems, calculateTotal])
+  const updateCartTotal = async () => {
+    const total = await calculateTotal(
+      chaiCartForm.getValues('chaiItems') ?? [],
+      chaiCartForm.getValues('foodItems') ?? []
+    )
+    setCartTotal(total.toFixed(2))
+  }
 
   if (loading) {
     return <LoadingSpinner />
@@ -242,9 +226,9 @@ const Order = () => {
                 </Typography>
                 {chaiDeliveryFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <FormControl fullWidth required>
-                        <InputLabel>Chai Flavor</InputLabel>
+                        <InputLabel>Chai Type</InputLabel>
                         <Controller
                           name={`chaiItems.${index}.id`}
                           control={chaiDeliveryForm.control}
@@ -252,7 +236,11 @@ const Order = () => {
                           render={({ field: selectField }) => (
                             <Select
                               {...selectField}
-                              label="Chai Flavor"
+                              label="Chai Type"
+                              onChange={(e) => {
+                                selectField.onChange(e);
+                                void updateDeliveryTotal();
+                              }}
                             >
                               {menuItems.chai.map((item) => (
                                 <MenuItem key={item.id} value={item.id}>
@@ -275,6 +263,10 @@ const Order = () => {
                             <Select
                               {...field}
                               label="Cups"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                void updateDeliveryTotal();
+                              }}
                             >
                               {[16, 32, 50, 66, 82, 100].map((option) => (
                                 <MenuItem key={option} value={option}>
@@ -285,6 +277,15 @@ const Order = () => {
                           </FormControl>
                         )}
                       />
+                    </Grid>
+                    <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
+                      <IconButton 
+                        onClick={() => removeChaiDeliveryItem(index)}
+                        color="error"
+                        aria-label="Delete item"
+                      >
+                        <Delete />
+                      </IconButton>
                     </Grid>
                   </Grid>
                 ))}
@@ -335,7 +336,7 @@ const Order = () => {
                 </Typography>
                 {foodDeliveryFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <FormControl fullWidth required>
                         <InputLabel>Food Item</InputLabel>
                         <Controller
@@ -346,6 +347,10 @@ const Order = () => {
                             <Select
                               {...selectField}
                               label="Food Item"
+                              onChange={(e) => {
+                                selectField.onChange(e);
+                                void updateDeliveryTotal();
+                              }}
                             >
                               {menuItems.food.map((item) => (
                                 <MenuItem key={item.id} value={item.id}>
@@ -361,24 +366,30 @@ const Order = () => {
                       <Controller
                         name={`foodItems.${index}.quantity`}
                         control={chaiDeliveryForm.control}
-                        rules={{ 
-                          required: true, 
-                          min: 1, 
-                          max: 100 
-                        }}
+                        rules={{ required: true, min: 1, max: 100 }}
                         render={({ field }) => (
                           <TextField
                             {...field}
                             fullWidth
                             label="Quantity"
                             type="number"
-                            inputProps={{ 
-                              min: 1, 
-                              max: 100 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              void updateDeliveryTotal();
                             }}
+                            inputProps={{ min: 1, max: 100 }}
                           />
                         )}
                       />
+                    </Grid>
+                    <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
+                      <IconButton 
+                        onClick={() => removeFoodDeliveryItem(index)}
+                        color="error"
+                        aria-label="Delete item"
+                      >
+                        <Delete />
+                      </IconButton>
                     </Grid>
                   </Grid>
                 ))}
@@ -425,9 +436,9 @@ const Order = () => {
                 </Typography>
                 {chaiCartFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <FormControl fullWidth required>
-                        <InputLabel>Chai Flavor</InputLabel>
+                        <InputLabel>Chai Type</InputLabel>
                         <Controller
                           name={`chaiItems.${index}.id`}
                           control={chaiCartForm.control}
@@ -435,7 +446,11 @@ const Order = () => {
                           render={({ field: selectField }) => (
                             <Select
                               {...selectField}
-                              label="Chai Flavor"
+                              label="Chai Type"
+                              onChange={(e) => {
+                                selectField.onChange(e);
+                                void updateCartTotal();
+                              }}
                             >
                               {menuItems.chai.map((item) => (
                                 <MenuItem key={item.id} value={item.id}>
@@ -458,6 +473,10 @@ const Order = () => {
                             <Select
                               {...field}
                               label="Cups"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                void updateCartTotal();
+                              }}
                             >
                               {[16, 32, 50, 66, 82, 100].map((option) => (
                                 <MenuItem key={option} value={option}>
@@ -468,6 +487,15 @@ const Order = () => {
                           </FormControl>
                         )}
                       />
+                    </Grid>
+                    <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
+                      <IconButton 
+                        onClick={() => removeChaiCartItem(index)}
+                        color="error"
+                        aria-label="Delete item"
+                      >
+                        <Delete />
+                      </IconButton>
                     </Grid>
                   </Grid>
                 ))}
@@ -488,7 +516,7 @@ const Order = () => {
                 </Typography>
                 {foodCartFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <FormControl fullWidth required>
                         <InputLabel>Food Item</InputLabel>
                         <Controller
@@ -499,6 +527,10 @@ const Order = () => {
                             <Select
                               {...selectField}
                               label="Food Item"
+                              onChange={(e) => {
+                                selectField.onChange(e);
+                                void updateCartTotal();
+                              }}
                             >
                               {menuItems.food.map((item) => (
                                 <MenuItem key={item.id} value={item.id}>
@@ -514,24 +546,30 @@ const Order = () => {
                       <Controller
                         name={`foodItems.${index}.quantity`}
                         control={chaiCartForm.control}
-                        rules={{ 
-                          required: true, 
-                          min: 1, 
-                          max: 100 
-                        }}
+                        rules={{ required: true, min: 1, max: 100 }}
                         render={({ field }) => (
                           <TextField
                             {...field}
                             fullWidth
                             label="Quantity"
                             type="number"
-                            inputProps={{ 
-                              min: 1, 
-                              max: 100 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              void updateCartTotal();
                             }}
+                            inputProps={{ min: 1, max: 100 }}
                           />
                         )}
                       />
+                    </Grid>
+                    <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center' }}>
+                      <IconButton 
+                        onClick={() => removeFoodCartItem(index)}
+                        color="error"
+                        aria-label="Delete item"
+                      >
+                        <Delete />
+                      </IconButton>
                     </Grid>
                   </Grid>
                 ))}
