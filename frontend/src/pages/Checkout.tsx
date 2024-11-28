@@ -53,10 +53,28 @@ export default function Checkout() {
 
   useEffect(() => {
     if (location.state?.orderData) {
-      setOrderData(location.state.orderData);
+      console.log('Raw order data:', location.state.orderData);
+      
+      // Ensure numeric values are properly converted
+      const sanitizedOrderData: OrderData = {
+        ...location.state.orderData,
+        subtotal: Number(location.state.orderData.subtotal),
+        deliveryFee: Number(location.state.orderData.deliveryFee),
+        total: Number(location.state.orderData.total),
+        items: location.state.orderData.items.map((item: OrderItem) => ({
+          ...item,
+          price: Number(item.price),
+          quantity: Number(item.quantity)
+        }))
+      };
+      
+      console.log('Sanitized order data:', sanitizedOrderData);
+      setOrderData(sanitizedOrderData);
+      
       // Initialize Square booking
       initializeSquareBooking();
     } else {
+      console.log('No order data in location state');
       navigate('/order'); // Redirect if no order data
     }
   }, [location, navigate]);
@@ -155,13 +173,23 @@ export default function Checkout() {
                   <Typography>
                     {item.quantity}x {item.name}
                   </Typography>
-                  <Typography>${(item.price * item.quantity).toFixed(2)}</Typography>
+                  <Typography>
+                    ${typeof item.price === 'number' && typeof item.quantity === 'number' 
+                      ? (item.price * item.quantity).toFixed(2) 
+                      : '0.00'}
+                  </Typography>
                 </Box>
               ))}
               <Box sx={{ mt: 2, borderTop: 1, borderColor: 'divider', pt: 2 }}>
-                <Typography>Subtotal: ${orderData.subtotal.toFixed(2)}</Typography>
-                <Typography>Delivery Fee: ${orderData.deliveryFee.toFixed(2)}</Typography>
-                <Typography variant="h6">Total: ${orderData.total.toFixed(2)}</Typography>
+                <Typography>
+                  Subtotal: ${typeof orderData.subtotal === 'number' ? orderData.subtotal.toFixed(2) : '0.00'}
+                </Typography>
+                <Typography>
+                  Delivery Fee: ${typeof orderData.deliveryFee === 'number' ? orderData.deliveryFee.toFixed(2) : '0.00'}
+                </Typography>
+                <Typography variant="h6">
+                  Total: ${typeof orderData.total === 'number' ? orderData.total.toFixed(2) : '0.00'}
+                </Typography>
               </Box>
             </Box>
           )}
