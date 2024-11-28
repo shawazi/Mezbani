@@ -10,6 +10,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  Paper,
 } from '@mui/material';
 import { getAuth } from 'firebase/auth';
 import { getFunctions } from 'firebase/functions';
