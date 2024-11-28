@@ -1,10 +1,10 @@
 {
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "rules": "frontend/firestore.rules",
+    "indexes": "frontend/firestore.indexes.json"
   },
   "hosting": {
-    "public": "dist",
+    "public": "frontend/dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -16,5 +16,8 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "functions": {
+    "source": "booking"
   }
 }

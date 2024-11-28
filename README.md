@@ -106,6 +106,31 @@ Visit our site at: [mezbani.shawaz.org](https://mezbani.shawaz.org)
 
 ## 📝 Firebase Configuration
 
+### Square Integration Setup
+
+1. **Square Developer Account**
+   - Create a [Square Developer Account](https://developer.squareup.com/)
+   - Create a new application in the Developer Dashboard
+   - Note down your:
+     - Sandbox Access Token (for testing)
+     - Production Access Token (for live site)
+     - Booking site URL from Square Dashboard > Booking > Online Booking Site
+
+2. **Firebase Function Configuration**
+   ```bash
+   # Set Square credentials in Firebase
+   firebase functions:config:set square.accesstoken="YOUR_SQUARE_ACCESS_TOKEN" square.bookingurl="YOUR_SQUARE_BOOKING_URL"
+
+   # Verify configuration
+   firebase functions:config:get
+   ```
+
+3. **Install Square Dependencies**
+   ```bash
+   cd functions
+   npm install square
+   ```
+
 ### Firestore Security Rules
 Located in `frontend/firestore.rules`:
 ```javascript
@@ -187,6 +212,13 @@ mezbani/
 │   ├── firestore.rules      # Firestore security rules
 │   ├── firestore.indexes.json # Firestore indexes
 │   └── firebase.json        # Firebase configuration
+├── functions/          # Firebase Cloud Functions
+│   ├── src/
+│   │   ├── square/    # Square integration functions
+│   │   │   ├── booking.ts    # Booking functions
+│   │   │   └── payment.ts    # Payment functions
+│   │   └── index.ts   # Function exports
+│   └── package.json   # Function dependencies
 ├── scripts/           # Database initialization scripts
 │   ├── init-db.ts    # Script to populate menu items
 │   └── .env          # Script environment variables
