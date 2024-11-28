@@ -390,7 +390,7 @@ const Order = () => {
                 </Typography>
                 {chaiDeliveryFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={7}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth required>
                         <InputLabel>Chai Type</InputLabel>
                         <Controller
@@ -416,7 +416,7 @@ const Order = () => {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                       <Controller
                         name={`chaiItems.${index}.quantity`}
                         control={chaiDeliveryForm.control}
@@ -430,6 +430,16 @@ const Order = () => {
                               onChange={(e) => {
                                 field.onChange(e);
                                 void updateDeliveryTotal();
+                              }}
+                              MenuProps={{
+                                PaperProps: {
+                                  sx: { maxHeight: 300 }
+                                }
+                              }}
+                              sx={{
+                                '& .MuiSelect-select': {
+                                  minWidth: '80px'
+                                }
                               }}
                             >
                               {[16, 32, 50, 66, 82, 100].map((option) => (
@@ -470,7 +480,7 @@ const Order = () => {
                 </Typography>
                 {foodDeliveryFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={7}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth required>
                         <InputLabel>Food Item</InputLabel>
                         <Controller
@@ -496,23 +506,39 @@ const Order = () => {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                       <Controller
                         name={`foodItems.${index}.quantity`}
                         control={chaiDeliveryForm.control}
                         rules={{ required: true, min: 1, max: 100 }}
                         render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            label="Quantity"
-                            type="number"
-                            onChange={(e) => {
-                              field.onChange(e);
-                              void updateDeliveryTotal();
-                            }}
-                            inputProps={{ min: 1, max: 100 }}
-                          />
+                          <FormControl fullWidth required>
+                            <InputLabel>Quantity</InputLabel>
+                            <Select
+                              {...field}
+                              label="Quantity"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                void updateDeliveryTotal();
+                              }}
+                              MenuProps={{
+                                PaperProps: {
+                                  sx: { maxHeight: 300 }
+                                }
+                              }}
+                              sx={{
+                                '& .MuiSelect-select': {
+                                  minWidth: '80px'
+                                }
+                              }}
+                            >
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
                         )}
                       />
                     </Grid>
@@ -619,7 +645,7 @@ const Order = () => {
                 </Typography>
                 {chaiCartFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={7}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth required>
                         <InputLabel>Chai Type</InputLabel>
                         <Controller
@@ -645,7 +671,7 @@ const Order = () => {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                       <Controller
                         name={`chaiItems.${index}.quantity`}
                         control={chaiCartForm.control}
@@ -659,6 +685,16 @@ const Order = () => {
                               onChange={(e) => {
                                 field.onChange(e);
                                 void updateCartTotal();
+                              }}
+                              MenuProps={{
+                                PaperProps: {
+                                  sx: { maxHeight: 300 }
+                                }
+                              }}
+                              sx={{
+                                '& .MuiSelect-select': {
+                                  minWidth: '80px'
+                                }
                               }}
                             >
                               {[16, 32, 50, 66, 82, 100].map((option) => (
@@ -699,7 +735,7 @@ const Order = () => {
                 </Typography>
                 {foodCartFields.map((field, index) => (
                   <Grid container spacing={2} key={field.id} sx={{ mb: 2, px: 3 }}>
-                    <Grid item xs={7}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth required>
                         <InputLabel>Food Item</InputLabel>
                         <Controller
@@ -725,23 +761,39 @@ const Order = () => {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                       <Controller
                         name={`foodItems.${index}.quantity`}
                         control={chaiCartForm.control}
                         rules={{ required: true, min: 1, max: 100 }}
                         render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            label="Quantity"
-                            type="number"
-                            onChange={(e) => {
-                              field.onChange(e);
-                              void updateCartTotal();
-                            }}
-                            inputProps={{ min: 1, max: 100 }}
-                          />
+                          <FormControl fullWidth required>
+                            <InputLabel>Quantity</InputLabel>
+                            <Select
+                              {...field}
+                              label="Quantity"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                void updateCartTotal();
+                              }}
+                              MenuProps={{
+                                PaperProps: {
+                                  sx: { maxHeight: 300 }
+                                }
+                              }}
+                              sx={{
+                                '& .MuiSelect-select': {
+                                  minWidth: '80px'
+                                }
+                              }}
+                            >
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
                         )}
                       />
                     </Grid>
