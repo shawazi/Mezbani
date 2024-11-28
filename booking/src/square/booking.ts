@@ -21,6 +21,15 @@ const functionConfig: HttpsOptions = {
   secrets: [SQUARE_ACCESS_TOKEN],
   minInstances: 0,
   maxInstances: 10,
+  cors: {
+    origin: [
+      'http://localhost:3000',
+      'https://mezbani.shawaz.org'
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }
 };
 
 // Square API constants
@@ -35,7 +44,7 @@ const SQUARE_PATH = `book/${SQUARE_ID_PATH}`;
 const SQUARE_BASE_URL = `${SQUARE_HOST}/${SQUARE_PATH}`;
 
 export const getSquareBookingUrlHttp = onRequest(
-  {...functionConfig, cors: true},
+  {...functionConfig},
   async (req, res) => {
     try {
       const bookingUrl = `${SQUARE_BASE_URL}?staff=${SQUARE_STAFF_ID}`;
@@ -50,7 +59,7 @@ export const getSquareBookingUrlHttp = onRequest(
 );
 
 export const getAvailableBookingSlotsHttp = onRequest(
-  {...functionConfig, cors: true},
+  {...functionConfig},
   async (req, res) => {
     try {
       // Verify Firebase ID token

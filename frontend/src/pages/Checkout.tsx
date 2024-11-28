@@ -37,7 +37,7 @@ const steps = ['Order Review', 'Select Delivery Time', 'Sign Contract', 'Payment
 
 // Function URLs - replace with your actual function URLs
 const FUNCTION_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:5001/mezbani-14d1e/us-east4'
+  ? 'http://localhost:3000'
   : 'https://us-east4-mezbani-14d1e.cloudfunctions.net';
 
 export default function Checkout() {
