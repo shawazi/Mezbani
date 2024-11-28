@@ -9,9 +9,8 @@ import {
   Box,
   Link,
   IconButton,
-  Drawer,
-  List,
-  ListItem,
+  Menu,
+  MenuItem,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
@@ -28,53 +27,18 @@ const navItems = [
 ]
 
 const Layout = () => {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const location = useLocation()
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen)
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
   }
 
-  const drawer = (
-    <List>
-      {navItems.map((item) => (
-        <ListItem
-          key={item.path}
-          disablePadding
-          sx={{
-            color: 'black',
-            '&.Mui-selected': {
-              backgroundColor: 'rgba(0, 106, 78, 0.2)',
-            },
-            '&:hover': {
-              backgroundColor: 'rgba(0, 106, 78, 0.1)',
-            },
-          }}
-        >
-          <Button
-            component={RouterLink}
-            to={item.path}
-            onClick={handleDrawerToggle}
-            fullWidth
-            sx={{
-              justifyContent: 'flex-start',
-              px: 3,
-              py: 1.5,
-              color: 'black',
-              textAlign: 'left',
-              '&.Mui-selected': {
-                backgroundColor: 'rgba(0, 106, 78, 0.2)',
-              },
-            }}
-          >
-            {item.label}
-          </Button>
-        </ListItem>
-      ))}
-    </List>
-  )
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
 
   return (
     <Box 
@@ -133,18 +97,66 @@ const Layout = () => {
             </Typography>
 
             {isMobile ? (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="end"
-                onClick={handleDrawerToggle}
-                sx={{ 
-                  color: 'black',
-                  padding: '4px',
-                }}
-              >
-                <MenuIcon fontSize="small" />
-              </IconButton>
+              <>
+                <IconButton
+                  color="inherit"
+                  aria-label="menu"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleMenuOpen}
+                  sx={{ 
+                    color: 'black',
+                    padding: '4px',
+                  }}
+                >
+                  <MenuIcon fontSize="small" />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                  sx={{
+                    '& .MuiPaper-root': {
+                      backgroundColor: 'background.paper',
+                      minWidth: '200px',
+                      boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
+                      mt: 1,
+                    },
+                  }}
+                >
+                  {navItems.map((item) => (
+                    <MenuItem
+                      key={item.path}
+                      onClick={handleMenuClose}
+                      component={RouterLink}
+                      to={item.path}
+                      selected={location.pathname === item.path}
+                      sx={{
+                        py: 1,
+                        color: 'text.primary',
+                        '&.Mui-selected': {
+                          backgroundColor: 'rgba(0, 106, 78, 0.1)',
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 106, 78, 0.05)',
+                        },
+                      }}
+                    >
+                      {item.label}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </>
             ) : (
               <Box 
                 sx={{ 
@@ -179,26 +191,6 @@ const Layout = () => {
           </Toolbar>
         </Container>
       </AppBar>
-
-      <Drawer
-        variant="temporary"
-        anchor="right"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // Better mobile performance
-        }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { 
-            boxSizing: 'border-box', 
-            width: 240,
-            backgroundColor: 'background.paper',
-          },
-        }}
-      >
-        {drawer}
-      </Drawer>
 
       <Box 
         component="main" 
