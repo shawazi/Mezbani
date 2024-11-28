@@ -17,24 +17,23 @@ const Contact = () => {
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Typography 
+        variant="h2" 
+        component="h1" 
+        align="center" 
+        gutterBottom
+        sx={{
+          fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+          fontWeight: 500,
+          mb: { xs: 3, sm: 4 },
+          color: 'common.white'
+        }}
+      >
+        Contact Us
+      </Typography>
       <Grid container spacing={6}>
         <Grid item xs={12} md={6}>
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              gutterBottom
-              sx={{ color: bangladeshGreen }}
-            >
-              Contact Us
-            </Typography>
-            <Typography variant="h6" color="text.secondary" paragraph>
-              We'd love to hear from you. Get in touch with us for any questions,
-              feedback, or business inquiries.
-            </Typography>
-          </Box>
-
           <Box sx={{ mb: 4 }}>
             <Typography variant="h6" gutterBottom sx={{ color: bangladeshGreen }}>
               Visit Us
@@ -57,7 +56,7 @@ const Contact = () => {
             </Typography>
           </Box>
 
-          <Box>
+          <Box sx={{ mb: 4 }}>
             <Typography variant="h6" gutterBottom sx={{ color: bangladeshGreen }}>
               Get in Touch
             </Typography>

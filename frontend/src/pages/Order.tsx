@@ -352,7 +352,18 @@ const Order = () => {
         py: { xs: 4, md: 6 },
       }}
     >
-      <Typography variant="h1" component="h1" align="center" gutterBottom>
+      <Typography 
+        variant="h2" 
+        component="h1" 
+        align="center" 
+        gutterBottom
+        sx={{
+          fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+          fontWeight: 500,
+          mb: { xs: 3, sm: 4 },
+          color: 'common.white'
+        }}
+      >
         Place Your Order
       </Typography>
 

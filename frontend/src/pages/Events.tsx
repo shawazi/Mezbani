@@ -39,20 +39,24 @@ const events = [
 
 const Events = () => {
   return (
-    <Container>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          sx={{ color: bangladeshGreen }}
-        >
-          Event Services
-        </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-          Let us bring the authentic chai experience to your next event
-        </Typography>
-      </Box>
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Typography 
+        variant="h2" 
+        component="h1" 
+        align="center" 
+        gutterBottom
+        sx={{
+          fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+          fontWeight: 500,
+          mb: { xs: 3, sm: 4 },
+          color: 'common.white'
+        }}
+      >
+        Events
+      </Typography>
+      <Typography variant="h6" color="text.secondary" sx={{ mb: 4, textAlign: 'center' }}>
+        Let us bring the authentic chai experience to your next event
+      </Typography>
 
       <Grid container spacing={4}>
         {events.map((event) => (

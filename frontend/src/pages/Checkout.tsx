@@ -150,6 +150,20 @@ export default function Checkout() {
 
   return (
     <Container maxWidth="lg">
+      <Typography 
+        variant="h2" 
+        component="h1" 
+        align="center" 
+        gutterBottom
+        sx={{
+          fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+          fontWeight: 500,
+          mb: { xs: 3, sm: 4 },
+          color: 'common.white'
+        }}
+      >
+        Checkout
+      </Typography>
       <Box sx={{ width: '100%', mt: 4 }}>
         <Stepper activeStep={activeStep}>
           {steps.map((label) => (

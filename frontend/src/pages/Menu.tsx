@@ -49,31 +49,22 @@ const Menu = () => {
 
   return (
     <Box sx={{ overflow: 'hidden' }}>
-      {/* Header */}
-      <Box 
-        sx={{ 
-          textAlign: 'center',
-          py: { xs: 4, md: 6 },
-          position: 'relative',
-          zIndex: 2,
-          backgroundColor: 'background.paper',
-        }}
-      >
-        <Typography
-          variant="h1"
-          component="h1"
+      <Container maxWidth="lg" sx={{ pt: { xs: 4, md: 6 }, pb: { xs: 2, md: 3 } }}>
+        <Typography 
+          variant="h2" 
+          component="h1" 
+          align="center" 
+          gutterBottom
           sx={{
-            fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
-            fontWeight: 700,
-            mb: 2,
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            fontWeight: 500,
+            mb: { xs: 3, sm: 4 },
+            color: 'common.white'
           }}
         >
           Our Menu
         </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '600px', mx: 'auto' }}>
-          Experience the authentic taste of Bangladesh with our carefully curated selection of chai and traditional snacks.
-        </Typography>
-      </Box>
+      </Container>
 
       {/* Chai Section with Parallax */}
       <Box 
