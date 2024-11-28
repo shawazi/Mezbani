@@ -36,16 +36,33 @@ const SQUARE_BASE_URL = `${SQUARE_HOST}/${SQUARE_PATH}`;
 
 // Helper function to handle CORS
 const handleCors = (req: any, res: any) => {
-  const allowedOrigins = ['http://localhost:3000', 'https://mezbani.shawaz.org'];
+  // Get the origin from the request headers
   const origin = req.headers.origin;
-  
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5001',
+    'https://mezbani.shawaz.org'
+  ];
+
+  // Check if the origin is allowed
   if (allowedOrigins.includes(origin)) {
     res.set('Access-Control-Allow-Origin', origin);
-    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.set('Access-Control-Allow-Credentials', 'true');
+  } else {
+    // In development, be more permissive
+    if (process.env.NODE_ENV === 'development') {
+      res.set('Access-Control-Allow-Origin', origin);
+    } else {
+      res.set('Access-Control-Allow-Origin', 'https://mezbani.shawaz.org');
+    }
   }
 
+  // Set other CORS headers
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin');
+  res.set('Access-Control-Allow-Credentials', 'true');
+  res.set('Access-Control-Max-Age', '3600');
+
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(204).send('');
     return true;

@@ -28,17 +28,19 @@ interface OrderData {
   distance: number;
 }
 
-interface SquareBookingResponse {
-  bookingUrl: string;
-}
+// interface SquareBookingResponse {
+//   bookingUrl: string;
+// }
 
 // Checkout steps
 const steps = ['Order Review', 'Select Delivery Time', 'Sign Contract', 'Payment'];
 
 // Function URLs - replace with your actual function URLs
 const FUNCTION_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:3000'
+  ? 'http://localhost:5001/mezbani-14d1e/us-east4'
   : 'https://us-east4-mezbani-14d1e.cloudfunctions.net';
+
+const FUNCTION_NAME = 'getSquareBookingUrlHttp'; // Make sure to use the correct function name
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = useState(0);
@@ -62,23 +64,39 @@ export default function Checkout() {
   const initializeSquareBooking = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${FUNCTION_BASE_URL}/getSquareBookingUrlHttp`, {
+      const functionUrl = `${FUNCTION_BASE_URL}/${FUNCTION_NAME}`;
+      console.log('Fetching from:', functionUrl);
+      
+      const response = await fetch(functionUrl, {
         method: 'POST',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
         }
       });
-      
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response not OK:', {
+          url: functionUrl,
+          status: response.status,
+          statusText: response.statusText,
+          errorText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      const result = await response.json() as SquareBookingResponse;
-      setBookingUrl(result.bookingUrl);
-    } catch (err) {
-      setError('Failed to initialize booking. Please try again.');
-      console.error('Booking initialization error:', err);
+
+      const data = await response.json();
+      console.log('Booking URL response:', data);
+      if (!data.bookingUrl) {
+        throw new Error('No booking URL in response');
+      }
+      setBookingUrl(data.bookingUrl);
+    } catch (error) {
+      console.error('Booking initialization error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to initialize booking');
     } finally {
       setIsLoading(false);
     }
