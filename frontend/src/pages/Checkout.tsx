@@ -9,11 +9,8 @@ import {
   Button,
   Typography,
   CircularProgress,
-  Alert,
   Paper,
 } from '@mui/material';
-import { getAuth } from 'firebase/auth';
-import { getFunctions } from 'firebase/functions';
 
 interface OrderItem {
   id: string;
