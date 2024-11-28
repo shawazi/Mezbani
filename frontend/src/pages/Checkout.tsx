@@ -36,10 +36,7 @@ interface OrderData {
 const steps = ['Order Review', 'Select Delivery Time', 'Sign Contract', 'Payment'];
 
 // Function URLs - replace with your actual function URLs
-const FUNCTION_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:5001/mezbani-14d1e/us-east4'
-  : 'https://us-east4-mezbani-14d1e.cloudfunctions.net';
-
+const FUNCTION_BASE_URL = 'https://us-east4-mezbani-14d1e.cloudfunctions.net';
 const FUNCTION_NAME = 'getSquareBookingUrlHttp'; // Make sure to use the correct function name
 
 export default function Checkout() {
