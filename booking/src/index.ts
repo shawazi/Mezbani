@@ -1,5 +1,12 @@
-import { initializeApp } from "firebase-admin/app";
+import {initializeApp} from "firebase-admin/app";
+import {
+  getSquareBookingUrlHttp,
+  getAvailableBookingSlotsHttp,
+} from "./square/booking";
 
 initializeApp();
 
-export { getAvailableBookingSlots } from "./square/booking";
+export {
+  getSquareBookingUrlHttp,
+  getAvailableBookingSlotsHttp,
+};

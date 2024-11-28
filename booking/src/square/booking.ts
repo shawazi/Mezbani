@@ -1,6 +1,7 @@
-import { onCall, HttpsOptions } from "firebase-functions/v2/https";
-import { defineSecret } from "firebase-functions/params";
-import { Client, Environment, ApiError } from "square";
+import {onRequest, HttpsOptions} from "firebase-functions/v2/https";
+import {defineSecret} from "firebase-functions/params";
+import {Client, Environment, ApiError} from "square";
+import {getAuth} from "firebase-admin/auth";
 
 // Define secret
 const SQUARE_ACCESS_TOKEN = defineSecret("SQUARE_ACCESS_TOKEN");
@@ -15,23 +16,58 @@ interface BookingData {
 
 // Function configuration
 const functionConfig: HttpsOptions = {
-  region: 'us-east4',
-  memory: '256MiB',
+  region: "us-east4",
+  memory: "256MiB" as const,
   secrets: [SQUARE_ACCESS_TOKEN],
   minInstances: 0,
   maxInstances: 10,
-  cors: [
-    'http://localhost:3000',
-    'http://localhost:5173',  // Vite's default port
-    'https://mezbani-14d1e.web.app',
-    'https://mezbani-14d1e.firebaseapp.com'
-  ]
 };
 
-export const getAvailableBookingSlots = onCall(
-  functionConfig, 
-  async (request) => {
+// Square API constants
+const SQUARE_LOCATION_ID = "LTYDJVJKJ1YQE";
+const SQUARE_SERVICE_ID = "NPDWPGNVK7K5TQHDUKVHJ5BN";
+const SQUARE_STAFF_ID = "TMZfT_bNGi9oE9";
+
+// Build the base URL for Square booking
+const SQUARE_HOST = "https://square.site";
+const SQUARE_ID_PATH = `${SQUARE_LOCATION_ID}/${SQUARE_SERVICE_ID}`;
+const SQUARE_PATH = `book/${SQUARE_ID_PATH}`;
+const SQUARE_BASE_URL = `${SQUARE_HOST}/${SQUARE_PATH}`;
+
+export const getSquareBookingUrlHttp = onRequest(
+  {...functionConfig, cors: true},
+  async (req, res) => {
     try {
+      const bookingUrl = `${SQUARE_BASE_URL}?staff=${SQUARE_STAFF_ID}`;
+      res.json({bookingUrl});
+    } catch (error) {
+      console.error("Error generating booking URL:", error);
+      const errorMsg = error instanceof Error ?
+        error.message : "Failed to generate URL";
+      res.status(500).json({error: errorMsg});
+    }
+  }
+);
+
+export const getAvailableBookingSlotsHttp = onRequest(
+  {...functionConfig, cors: true},
+  async (req, res) => {
+    try {
+      // Verify Firebase ID token
+      const authHeader = req.headers.authorization;
+      if (!authHeader?.startsWith("Bearer ")) {
+        res.status(401).json({error: "Unauthorized - No token provided"});
+        return;
+      }
+
+      const idToken = authHeader.split("Bearer ")[1];
+      try {
+        await getAuth().verifyIdToken(idToken);
+      } catch (error) {
+        res.status(401).json({error: "Unauthorized - Invalid token"});
+        return;
+      }
+
       const token = SQUARE_ACCESS_TOKEN.value();
       if (!token) {
         throw new Error("Square access token not available");
@@ -40,24 +76,29 @@ export const getAvailableBookingSlots = onCall(
       // Initialize Square client with the secret
       const squareClient = new Client({
         accessToken: token,
-        environment: Environment.Production
+        environment: Environment.Production,
       });
 
-      if (!request.auth) {
-        throw new Error("User must be logged in to book appointments");
-      }
-
-      const data = request.data as BookingData;
-      if (!data?.locationId || !data?.serviceId || !data?.staffId || !data?.startAt) {
+      const data = req.body as BookingData;
+      const requiredFields = [
+        data?.locationId,
+        data?.serviceId,
+        data?.staffId,
+        data?.startAt,
+      ];
+      if (requiredFields.some((field) => !field)) {
         throw new Error("Missing required booking data");
       }
 
-      const { result } = await squareClient.bookingsApi.searchAvailability({
+      const endTime = new Date(data.startAt);
+      endTime.setDate(endTime.getDate() + 7);
+
+      const {result} = await squareClient.bookingsApi.searchAvailability({
         query: {
           filter: {
             startAtRange: {
               startAt: data.startAt,
-              endAt: new Date(new Date(data.startAt).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+              endAt: endTime.toISOString(),
             },
             locationId: data.locationId,
             segmentFilters: [
@@ -72,15 +113,15 @@ export const getAvailableBookingSlots = onCall(
         },
       });
 
-      return {
-        availabilities: result.availabilities || []
-      };
+      res.json({availabilities: result.availabilities || []});
     } catch (error) {
       console.error("Error getting booking availabilities:", error);
       if (error instanceof ApiError) {
-        throw new Error(error.message || "Failed to get booking availabilities");
+        const msg = error.message || "Failed to get booking availabilities";
+        res.status(500).json({error: msg});
+      } else {
+        res.status(500).json({error: "Failed to get booking availabilities"});
       }
-      throw new Error("Failed to get booking availabilities");
     }
   }
 );

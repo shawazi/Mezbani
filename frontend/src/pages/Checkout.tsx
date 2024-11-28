@@ -3,17 +3,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Container,
   Box,
-  Typography,
   Stepper,
   Step,
   StepLabel,
   Button,
-  Paper,
+  Typography,
   CircularProgress,
+  Alert,
 } from '@mui/material';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { getAuth } from 'firebase/auth';
+import { getFunctions } from 'firebase/functions';
 
-// Define types for our order data
 interface OrderItem {
   id: string;
   quantity: number;
@@ -37,17 +37,21 @@ interface SquareBookingResponse {
 // Checkout steps
 const steps = ['Order Review', 'Select Delivery Time', 'Sign Contract', 'Payment'];
 
+// Function URLs - replace with your actual function URLs
+const FUNCTION_BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:5001/mezbani-14d1e/us-east4'
+  : 'https://us-east4-mezbani-14d1e.cloudfunctions.net';
+
 export default function Checkout() {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [orderData, setOrderData] = useState<OrderData | null>(null);
-  const [bookingUrl, setBookingUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [bookingUrl, setBookingUrl] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Get order data from location state
     if (location.state?.orderData) {
       setOrderData(location.state.orderData);
       // Initialize Square booking
@@ -60,10 +64,20 @@ export default function Checkout() {
   const initializeSquareBooking = async () => {
     try {
       setIsLoading(true);
-      const functions = getFunctions();
-      const getBookingUrl = httpsCallable<unknown, SquareBookingResponse>(functions, 'getSquareBookingUrl');
-      const result = await getBookingUrl();
-      setBookingUrl(result.data.bookingUrl);
+      const response = await fetch(`${FUNCTION_BASE_URL}/getSquareBookingUrlHttp`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json() as SquareBookingResponse;
+      setBookingUrl(result.bookingUrl);
     } catch (err) {
       setError('Failed to initialize booking. Please try again.');
       console.error('Booking initialization error:', err);
