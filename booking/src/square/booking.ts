@@ -21,15 +21,6 @@ const functionConfig: HttpsOptions = {
   secrets: [SQUARE_ACCESS_TOKEN],
   minInstances: 0,
   maxInstances: 10,
-  cors: {
-    origin: [
-      'http://localhost:3000',
-      'https://mezbani.shawaz.org'
-    ],
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  }
 };
 
 // Square API constants
@@ -43,9 +34,31 @@ const SQUARE_ID_PATH = `${SQUARE_LOCATION_ID}/${SQUARE_SERVICE_ID}`;
 const SQUARE_PATH = `book/${SQUARE_ID_PATH}`;
 const SQUARE_BASE_URL = `${SQUARE_HOST}/${SQUARE_PATH}`;
 
+// Helper function to handle CORS
+const handleCors = (req: any, res: any) => {
+  const allowedOrigins = ['http://localhost:3000', 'https://mezbani.shawaz.org'];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set('Access-Control-Allow-Credentials', 'true');
+  }
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return true;
+  }
+  return false;
+};
+
 export const getSquareBookingUrlHttp = onRequest(
-  {...functionConfig},
+  functionConfig,
   async (req, res) => {
+    // Handle CORS
+    if (handleCors(req, res)) return;
+
     try {
       const bookingUrl = `${SQUARE_BASE_URL}?staff=${SQUARE_STAFF_ID}`;
       res.json({bookingUrl});
@@ -59,8 +72,11 @@ export const getSquareBookingUrlHttp = onRequest(
 );
 
 export const getAvailableBookingSlotsHttp = onRequest(
-  {...functionConfig},
+  functionConfig,
   async (req, res) => {
+    // Handle CORS
+    if (handleCors(req, res)) return;
+
     try {
       // Verify Firebase ID token
       const authHeader = req.headers.authorization;
