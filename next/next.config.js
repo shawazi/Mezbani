@@ -1,13 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["localhost:3000"]
+    }
+  },
   reactStrictMode: true,
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
+        hostname: 'lh3.googleusercontent.com',
         port: '',
-        pathname: '/v0/b/mezbani-14d1e.appspot.com/**',
+        pathname: '/a/**',
       },
     ],
   },

@@ -9,25 +9,39 @@ const client = new Client({
   environment: process.env.NODE_ENV === 'development' ? Environment.Sandbox : Environment.Production,
 });
 
+// Helper function to safely stringify BigInt values
+function replaceBigInt(key: string, value: any) {
+  if (typeof value === 'bigint') {
+    return Number(value);
+  }
+  return value;
+}
+
 export async function GET() {
   try {
     console.log('Initializing menu fetch from Square...', {
       environment: process.env.NODE_ENV,
-      usingDevToken: process.env.NODE_ENV === 'development'
+      usingDevToken: process.env.NODE_ENV === 'development',
+      token: process.env.NEXT_PUBLIC_DEVELOPMENT_SQUARE_ACCESS_TOKEN?.slice(0, 5) + '...'
     });
     
     // First, get all categories to map IDs to names
     const categoriesResponse = await client.catalogApi.listCatalog(undefined, 'CATEGORY');
+    console.log('Categories response:', JSON.stringify(categoriesResponse.result, replaceBigInt, 2));
+    
     const categoryMap = new Map(
       categoriesResponse.result.objects
         ?.filter(obj => obj.type === 'CATEGORY')
         .map(cat => [cat.id, cat.categoryData?.name]) || []
     );
 
+    console.log('Category map:', Object.fromEntries(categoryMap));
+
     // Fetch catalog items from Square
     const response = await client.catalogApi.searchCatalogItems({
       // You can add custom attributes or category filters here
     });
+    console.log('Items response:', JSON.stringify(response.result, replaceBigInt, 2));
 
     if (!response.result || !response.result.items) {
       throw new Error('No menu items found');
@@ -38,12 +52,13 @@ export async function GET() {
       id: item.id,
       name: item.itemData?.name || '',
       description: item.itemData?.description || '',
-      price: item.itemData?.variations?.[0]?.itemVariationData?.priceMoney?.amount || 0,
+      // Convert BigInt to number for JSON serialization
+      price: Number(item.itemData?.variations?.[0]?.itemVariationData?.priceMoney?.amount || 0),
       category: categoryMap.get(item.itemData?.categoryId || '') || 'uncategorized',
       image: item.itemData?.imageIds?.[0] || null,
     }));
 
-    console.log('Successfully fetched menu items. Count:', menuItems.length);
+    console.log('Successfully fetched menu items:', JSON.stringify(menuItems, replaceBigInt, 2));
     
     const headers = {
       'Cache-Control': 'no-store, must-revalidate',
@@ -58,6 +73,7 @@ export async function GET() {
       message: error?.message || 'No error message available',
       stack: error?.stack || 'No stack trace available',
       environment: process.env.NODE_ENV,
+      error: error
     });
 
     return NextResponse.json(
