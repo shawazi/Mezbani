@@ -49,8 +49,10 @@ export async function GET() {
 
     // Transform Square catalog items into our menu format
     const menuItems = response.result.items.map(item => {
-      const rawCategory = categoryMap.get(item.itemData?.categoryId || '') || 'Other';
-      console.log(`Mapping item ${item.itemData?.name} with category ID ${item.itemData?.categoryId} to category ${rawCategory}`);
+      const itemCategories = item.itemData?.categories || [];
+      const categoryId = itemCategories[0]?.id;
+      const rawCategory = categoryMap.get(categoryId || '') || 'Other';
+      console.log(`Mapping item ${item.itemData?.name} with category ID ${categoryId} to category ${rawCategory}`);
       
       // Map category names to our desired display names
       const displayCategory = rawCategory === 'Chai' ? 'Chai' :
