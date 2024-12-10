@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',  
   images: {
     remotePatterns: [
       {
@@ -11,7 +10,6 @@ const nextConfig = {
         pathname: '/v0/b/mezbani-14d1e.appspot.com/**',
       },
     ],
-    unoptimized: true,  
   },
 };
 
