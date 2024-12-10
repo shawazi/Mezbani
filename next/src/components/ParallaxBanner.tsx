@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import Image from 'next/image';
 
 export default function ParallaxBanner({ imagePath, title, height = 400 }: { imagePath: string; title: string; height?: number }) {
@@ -8,16 +8,18 @@ export default function ParallaxBanner({ imagePath, title, height = 400 }: { ima
     <Box 
       sx={{ 
         position: 'relative',
+        width: '100%',
         height: `${height}px`,
         overflow: 'hidden',
         mb: 4
       }}
     >
-      <Box
+      <Container 
+        maxWidth="lg"
         sx={{
           position: 'relative',
-          width: '100%',
           height: '100%',
+          px: { xs: 0 }, // Remove padding on mobile
         }}
       >
         <Image
@@ -25,7 +27,7 @@ export default function ParallaxBanner({ imagePath, title, height = 400 }: { ima
           alt={title}
           fill
           priority={imagePath === '/images/chai-banner.jpg'}
-          sizes="100vw"
+          sizes="(max-width: 1200px) 100vw, 1200px"
           style={{
             objectFit: 'cover',
           }}
@@ -52,12 +54,13 @@ export default function ParallaxBanner({ imagePath, title, height = 400 }: { ima
               textAlign: 'center',
               fontWeight: 'bold',
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+              px: 2, // Add padding for mobile
             }}
           >
             {title}
           </Typography>
         </Box>
-      </Box>
+      </Container>
     </Box>
   );
 }

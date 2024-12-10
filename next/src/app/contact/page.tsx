@@ -1,23 +1,15 @@
-'use client';
-
-import {
-  Typography,
-  Grid,
-  Box,
-  TextField,
-  Button,
-  Paper,
-} from '@mui/material';
-import { bangladeshGreen, bangladeshRed } from '@/theme';
+import { Suspense } from 'react';
+import { Typography, Grid } from '@mui/material';
 import PageLayout from '@/components/PageLayout';
+import ContactInfo from '@/components/ContactInfo';
+import DynamicContactForm from '@/components/DynamicContactForm';
 
-export default function Contact() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // TODO: Handle form submission
-    console.log('Form submitted');
-  };
+export const metadata = {
+  title: 'Contact Us - Mezbani',
+  description: 'Get in touch with us for any questions or concerns about our chai and snacks.',
+};
 
+export default async function Contact() {
   return (
     <PageLayout>
       <Typography 
@@ -34,139 +26,18 @@ export default function Contact() {
       >
         Contact Us
       </Typography>
+      
       <Grid container spacing={6}>
         <Grid item xs={12} md={6}>
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom sx={{ color: bangladeshGreen }}>
-              Visit Us
-            </Typography>
-            <Typography variant="body1" paragraph>
-              123 Main Street
-              <br />
-              Watertown, MA 02472
-            </Typography>
-          </Box>
-
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom sx={{ color: bangladeshGreen }}>
-              Business Hours
-            </Typography>
-            <Typography variant="body1" paragraph>
-              Monday - Friday: 8:00 AM - 8:00 PM
-              <br />
-              Saturday - Sunday: 9:00 AM - 6:00 PM
-            </Typography>
-          </Box>
-
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom sx={{ color: bangladeshGreen }}>
-              Get in Touch
-            </Typography>
-            <Typography variant="body1" paragraph>
-              Phone: (555) 123-4567
-              <br />
-              Email: info@mezbanichai.com
-            </Typography>
-          </Box>
+          <Suspense fallback={<Typography>Loading contact information...</Typography>}>
+            <ContactInfo />
+          </Suspense>
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: 4,
-              bgcolor: 'background.paper',
-            }}
-          >
-            <Typography variant="h5" gutterBottom sx={{ color: bangladeshGreen }}>
-              Send us a Message
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    required
-                    fullWidth
-                    label="First Name"
-                    variant="outlined"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: 'rgba(255, 255, 255, 0.23)',
-                        },
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    required
-                    fullWidth
-                    label="Last Name"
-                    variant="outlined"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: 'rgba(255, 255, 255, 0.23)',
-                        },
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    variant="outlined"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: 'rgba(255, 255, 255, 0.23)',
-                        },
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    label="Message"
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: 'rgba(255, 255, 255, 0.23)',
-                        },
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    fullWidth
-                    size="large"
-                    sx={{
-                      mt: 2,
-                      backgroundColor: bangladeshRed,
-                      '&:hover': {
-                        backgroundColor: bangladeshRed,
-                        filter: 'brightness(1.1)',
-                      },
-                    }}
-                  >
-                    Send Message
-                  </Button>
-                </Grid>
-              </Grid>
-            </form>
-          </Paper>
+          <Suspense>
+            <DynamicContactForm />
+          </Suspense>
         </Grid>
       </Grid>
     </PageLayout>
