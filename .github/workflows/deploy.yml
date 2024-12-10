@@ -11,6 +11,9 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -24,6 +27,13 @@ jobs:
       - name: Install dependencies
         working-directory: ./next
         run: npm ci
+
+      - name: Debug Secrets
+        run: |
+          echo "Checking if secrets are available..."
+          echo "API_KEY exists: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY != '' }}"
+          echo "AUTH_DOMAIN exists: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN != '' }}"
+          echo "PROJECT_ID exists: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID != '' }}"
 
       - name: Verify environment variables
         working-directory: ./next
