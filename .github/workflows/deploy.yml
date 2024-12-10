@@ -22,6 +22,8 @@ jobs:
       NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
       NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
       NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+      NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+      NEXT_PUBLIC_FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
       SQUARE_ACCESS_TOKEN: ${{ secrets.SQUARE_ACCESS_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +35,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './next/package-lock.json'
 
+      # Add Firebase authentication
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+
       - name: Install dependencies
         working-directory: ./next
         run: npm ci
@@ -43,6 +51,8 @@ jobs:
           echo "API_KEY exists: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY != '' }}"
           echo "AUTH_DOMAIN exists: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN != '' }}"
           echo "PROJECT_ID exists: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID != '' }}"
+          echo "CLIENT_EMAIL exists: ${{ secrets.FIREBASE_CLIENT_EMAIL != '' }}"
+          echo "PRIVATE_KEY exists: ${{ secrets.FIREBASE_PRIVATE_KEY != '' }}"
 
       - name: Verify environment variables
         working-directory: ./next
@@ -55,6 +65,8 @@ jobs:
           [[ -z "$NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET" ]] && missing_vars+=("Storage Bucket")
           [[ -z "$NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID" ]] && missing_vars+=("Messaging Sender ID")
           [[ -z "$NEXT_PUBLIC_FIREBASE_APP_ID" ]] && missing_vars+=("App ID")
+          [[ -z "$NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL" ]] && missing_vars+=("Client Email")
+          [[ -z "$NEXT_PUBLIC_FIREBASE_PRIVATE_KEY" ]] && missing_vars+=("Private Key")
           
           if [ ${#missing_vars[@]} -ne 0 ]; then
             echo "Error: Missing required environment variables:"
@@ -77,6 +89,8 @@ jobs:
           echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" >> .env
           echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ env.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> .env
           echo "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${{ env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}" >> .env
+          echo "NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL=${{ env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL }}" >> .env
+          echo "NEXT_PUBLIC_FIREBASE_PRIVATE_KEY=${{ env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY }}" >> .env
           echo "SQUARE_ACCESS_TOKEN=${{ env.SQUARE_ACCESS_TOKEN }}" >> .env
           npm run build
           touch .next/export-marker.json
