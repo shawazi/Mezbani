@@ -8,10 +8,25 @@ import {
   Grid,
 } from '@mui/material';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { bangladeshRed } from '@/theme';
 import PageLayout from '@/components/PageLayout';
 
 export default function Home() {
+  useEffect(() => {
+    const testSquareIntegration = async () => {
+      try {
+        const response = await fetch('/api/square-test');
+        const data = await response.json();
+        console.log('Square Integration Test:', data);
+      } catch (error) {
+        console.error('Square Integration Test Error:', error);
+      }
+    };
+
+    testSquareIntegration();
+  }, []);
+
   return (
     <PageLayout>
       <Box sx={{ width: '100%' }}>
