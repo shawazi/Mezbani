@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
+    optimizeCss: true,
     serverActions: {
       allowedOrigins: ["localhost:3000"]
     }
@@ -15,6 +16,20 @@ const nextConfig = {
         pathname: '/a/**',
       },
     ],
+  },
+  webpack: (config) => {
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true,
+        },
+      },
+    };
+    return config;
   },
 };
 

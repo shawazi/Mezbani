@@ -191,12 +191,20 @@ function Menu() {
 
   // Group items by category
   const groupedItems = menuItems.reduce<Record<string, MenuItem[]>>((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
+    const category = item.category;
+    if (!acc[category]) {
+      acc[category] = [];
     }
-    acc[item.category].push(item);
+    acc[category].push(item);
     return acc;
   }, {});
+
+  // Define category order
+  const categoryOrder = ['Chai', 'Snacks'];
+
+  // Debug logging
+  console.log('Menu Items:', menuItems);
+  console.log('Grouped Items:', groupedItems);
 
   return (
     <>
@@ -205,9 +213,11 @@ function Menu() {
         title="Our Menu"
       />
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {Object.entries(groupedItems).map(([category, items]) => (
-          <MenuSection key={category} title={category} items={items} />
-        ))}
+        {categoryOrder.map((category) => 
+          groupedItems[category]?.length > 0 && (
+            <MenuSection key={category} title={category} items={groupedItems[category]} />
+          )
+        )}
       </Container>
     </>
   );

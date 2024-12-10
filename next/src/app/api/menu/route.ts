@@ -41,23 +41,35 @@ export async function GET() {
     const response = await client.catalogApi.searchCatalogItems({
       // You can add custom attributes or category filters here
     });
-    console.log('Items response:', JSON.stringify(response.result, replaceBigInt, 2));
+    console.log('Raw items response:', JSON.stringify(response.result, replaceBigInt, 2));
 
     if (!response.result || !response.result.items) {
       throw new Error('No menu items found');
     }
 
     // Transform Square catalog items into our menu format
-    const menuItems = response.result.items.map(item => ({
-      id: item.id,
-      name: item.itemData?.name || '',
-      description: item.itemData?.description || '',
-      // Convert BigInt to number for JSON serialization
-      price: Number(item.itemData?.variations?.[0]?.itemVariationData?.priceMoney?.amount || 0),
-      category: categoryMap.get(item.itemData?.categoryId || '') || 'uncategorized',
-      image: item.itemData?.imageIds?.[0] || null,
-    }));
+    const menuItems = response.result.items.map(item => {
+      const rawCategory = categoryMap.get(item.itemData?.categoryId || '') || 'Other';
+      console.log(`Mapping item ${item.itemData?.name} with category ID ${item.itemData?.categoryId} to category ${rawCategory}`);
+      
+      // Map category names to our desired display names
+      const displayCategory = rawCategory === 'Chai' ? 'Chai' :
+                            rawCategory === 'Snacks' ? 'Snacks' :
+                            'Other';
+      
+      return {
+        id: item.id,
+        name: item.itemData?.name || '',
+        description: item.itemData?.description || '',
+        // Convert BigInt to number for JSON serialization
+        price: Number(item.itemData?.variations?.[0]?.itemVariationData?.priceMoney?.amount || 0),
+        category: displayCategory,  // Use the mapped display category
+        image: item.itemData?.imageIds?.[0] || null,
+      };
+    });
 
+    console.log('Final transformed menu items:', JSON.stringify(menuItems, replaceBigInt, 2));
+    
     console.log('Successfully fetched menu items:', JSON.stringify(menuItems, replaceBigInt, 2));
     
     const headers = {

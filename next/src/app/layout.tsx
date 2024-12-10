@@ -20,12 +20,14 @@ const montserrat = Montserrat({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-montserrat',
+  preload: true,
 });
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-playfair',
+  preload: true,
 });
 
 export const metadata: Metadata = {
