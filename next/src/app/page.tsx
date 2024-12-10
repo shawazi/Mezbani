@@ -7,6 +7,7 @@ import {
   Button,
   Grid,
 } from '@mui/material';
+import Link from 'next/link';
 import { bangladeshRed } from '@/theme';
 import PageLayout from '@/components/PageLayout';
 
@@ -58,25 +59,25 @@ export default function Home() {
                 Experience the authentic taste of Bangladesh in every cup of our
                 handcrafted chai
               </Typography>
-              <Button
-                href="/order"
-                component="a"
-                variant="contained"
-                size="large"
-                sx={{
-                  mt: 4,
-                  backgroundColor: bangladeshRed,
-                  '&:hover': {
+              <Link href="/order" passHref style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    mt: 4,
                     backgroundColor: bangladeshRed,
-                    filter: 'brightness(1.1)',
-                  },
-                  px: { xs: 3, sm: 6 },
-                  py: { xs: 1.5, sm: 2 },
-                  fontSize: { xs: '1rem', sm: '1.25rem' },
-                }}
-              >
-                Order Now
-              </Button>
+                    '&:hover': {
+                      backgroundColor: bangladeshRed,
+                      filter: 'brightness(1.1)',
+                    },
+                    px: { xs: 3, sm: 6 },
+                    py: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '1rem', sm: '1.25rem' },
+                  }}
+                >
+                  Order Now
+                </Button>
+              </Link>
             </Box>
           </Box>
         </Box>
