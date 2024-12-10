@@ -1,15 +1,38 @@
 import { Suspense } from 'react';
-import { Typography, Grid } from '@mui/material';
+import { Typography, Grid, Box } from '@mui/material';
 import PageLayout from '@/components/PageLayout';
 import ContactInfo from '@/components/ContactInfo';
-import DynamicContactForm from '@/components/DynamicContactForm';
+import dynamic from 'next/dynamic';
 
 export const metadata = {
   title: 'Contact Us - Mezbani',
   description: 'Get in touch with us for any questions or concerns about our chai and snacks.',
 };
 
-export default async function Contact() {
+// Dynamically import the form with custom loading
+const DynamicContactForm = dynamic(
+  () => import('@/components/DynamicContactForm'),
+  {
+    loading: () => (
+      <Box
+        sx={{
+          p: 4,
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '400px',
+        }}
+      >
+        <Typography>Loading contact form...</Typography>
+      </Box>
+    ),
+    ssr: true,
+  }
+);
+
+export default function Contact() {
   return (
     <PageLayout>
       <Typography 
@@ -35,9 +58,7 @@ export default async function Contact() {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Suspense>
-            <DynamicContactForm />
-          </Suspense>
+          <DynamicContactForm />
         </Grid>
       </Grid>
     </PageLayout>

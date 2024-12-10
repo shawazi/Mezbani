@@ -1,11 +1,12 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import { Suspense, lazy } from 'react';
 import { Box, Typography } from '@mui/material';
 
-// Preload the contact form
-const ContactForm = dynamic(() => import('@/components/ContactForm'), {
-  loading: () => (
+const ContactForm = lazy(() => import('@/components/ContactForm'));
+
+function LoadingFallback() {
+  return (
     <Box
       sx={{
         p: 4,
@@ -18,21 +19,13 @@ const ContactForm = dynamic(() => import('@/components/ContactForm'), {
     >
       <Typography>Loading form...</Typography>
     </Box>
-  ),
-  ssr: true // Enable SSR for faster initial load
-});
-
-// Preload the component
-const preload = () => void ContactForm.preload?.();
-if (typeof window !== 'undefined') {
-  // Preload when the page becomes visible
-  if (document.visibilityState === 'visible') {
-    preload();
-  } else {
-    document.addEventListener('visibilitychange', preload, { once: true });
-  }
+  );
 }
 
 export default function DynamicContactForm() {
-  return <ContactForm />;
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ContactForm />
+    </Suspense>
+  );
 }
