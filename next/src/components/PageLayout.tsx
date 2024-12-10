@@ -1,7 +1,6 @@
 'use client';
 
 import { Container, Box, Typography, Link } from '@mui/material';
-import Navigation from './Navigation';
 
 export default function PageLayout({
   children,
@@ -21,12 +20,10 @@ export default function PageLayout({
         maxWidth: '100%',
       }}
     >
-      <Navigation />
-      
-      <Container 
-        component="main" 
+      <Container
+        component="main"
         maxWidth={maxWidth}
-        sx={{ 
+        sx={{
           flexGrow: 1,
           py: 4,
           display: 'flex',
