@@ -14,22 +14,31 @@ interface MenuItem {
 }
 
 async function getMenuItems() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000'}/api/menu`, {
-    next: { revalidate: 60 } // Revalidate every minute
-  });
-  
-  if (!res.ok) {
-    throw new Error('Failed to fetch menu items');
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000'}/api/menu`, {
+      next: { revalidate: 3600 } // Revalidate every hour instead of every minute
+    });
+    
+    if (!res.ok) {
+      throw new Error('Failed to fetch menu items');
+    }
+    
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching menu items:', error);
+    return { chaiItems: [], snackItems: [] };
   }
-  
-  return res.json();
 }
 
 export default async function Menu() {
   const menuItems = await getMenuItems();
   
-  const chaiItems = menuItems.filter((item: MenuItem) => item.category === 'Chai');
-  const snackItems = menuItems.filter((item: MenuItem) => item.category === 'Snacks');
+  const chaiItems = Array.isArray(menuItems) 
+    ? menuItems.filter((item: MenuItem) => item.category === 'Chai')
+    : [];
+  const snackItems = Array.isArray(menuItems)
+    ? menuItems.filter((item: MenuItem) => item.category === 'Snacks')
+    : [];
 
   return (
     <Container maxWidth="lg">

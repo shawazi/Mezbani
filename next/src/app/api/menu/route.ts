@@ -19,15 +19,8 @@ function replaceBigInt(key: string, value: any) {
 
 export async function GET() {
   try {
-    console.log('Initializing menu fetch from Square...', {
-      environment: process.env.NODE_ENV,
-      usingDevToken: process.env.NODE_ENV === 'development',
-      token: process.env.NEXT_PUBLIC_DEVELOPMENT_SQUARE_ACCESS_TOKEN?.slice(0, 5) + '...'
-    });
-    
     // First, get all categories to map IDs to names
     const categoriesResponse = await client.catalogApi.listCatalog(undefined, 'CATEGORY');
-    console.log('Categories response:', JSON.stringify(categoriesResponse.result, replaceBigInt, 2));
     
     const categoryMap = new Map(
       categoriesResponse.result.objects
@@ -35,13 +28,10 @@ export async function GET() {
         .map(cat => [cat.id, cat.categoryData?.name]) || []
     );
 
-    console.log('Category map:', Object.fromEntries(categoryMap));
-
     // Fetch catalog items from Square
     const response = await client.catalogApi.searchCatalogItems({
       // You can add custom attributes or category filters here
     });
-    console.log('Raw items response:', JSON.stringify(response.result, replaceBigInt, 2));
 
     if (!response.result || !response.result.items) {
       throw new Error('No menu items found');
@@ -52,7 +42,6 @@ export async function GET() {
       const itemCategories = item.itemData?.categories || [];
       const categoryId = itemCategories[0]?.id;
       const rawCategory = categoryMap.get(categoryId || '') || 'Other';
-      console.log(`Mapping item ${item.itemData?.name} with category ID ${categoryId} to category ${rawCategory}`);
       
       // Map category names to our desired display names
       const displayCategory = rawCategory === 'Chai' ? 'Chai' :
@@ -63,35 +52,22 @@ export async function GET() {
         id: item.id,
         name: item.itemData?.name || '',
         description: item.itemData?.description || '',
-        // Convert BigInt to number for JSON serialization
         price: Number(item.itemData?.variations?.[0]?.itemVariationData?.priceMoney?.amount || 0),
-        category: displayCategory,  // Use the mapped display category
+        category: displayCategory,
         image: item.itemData?.imageIds?.[0] || null,
       };
     });
-
-    console.log('Final transformed menu items:', JSON.stringify(menuItems, replaceBigInt, 2));
-    
-    console.log('Successfully fetched menu items:', JSON.stringify(menuItems, replaceBigInt, 2));
     
     const headers = {
-      'Cache-Control': 'no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
     };
     
     return NextResponse.json(menuItems, { headers });
   } catch (error: any) {
-    console.error('Error fetching menu from Square:', {
-      name: error?.name || 'UnknownError',
-      message: error?.message || 'No error message available',
-      stack: error?.stack || 'No stack trace available',
-      environment: process.env.NODE_ENV,
-      error: error
-    });
+    console.error('Error fetching menu from Square:', error?.message);
 
     return NextResponse.json(
-      { error: 'Failed to fetch menu items', details: error?.message || 'Unknown error' }, 
+      { error: 'Failed to fetch menu items' }, 
       { status: 500, headers: { 'Cache-Control': 'no-store' } }
     );
   }
