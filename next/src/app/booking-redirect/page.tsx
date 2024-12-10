@@ -1,12 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Typography } from '@mui/material';
 import PageLayout from '@/components/PageLayout';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-export default function BookingRedirect() {
+function BookingRedirectContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -36,17 +37,27 @@ export default function BookingRedirect() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: '50vh',
+          minHeight: '60vh',
+          textAlign: 'center',
+          p: 4,
         }}
       >
         <LoadingSpinner />
-        <Typography variant="h6" sx={{ mt: 4, textAlign: 'center' }}>
-          Processing your booking...
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 4 }}>
+          Processing Your Booking
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
-          Please wait while we confirm your order.
+        <Typography variant="body1" color="text.secondary">
+          Please wait while we confirm your booking details...
         </Typography>
       </Box>
     </PageLayout>
+  );
+}
+
+export default function BookingRedirect() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <BookingRedirectContent />
+    </Suspense>
   );
 }
