@@ -58,8 +58,10 @@ export async function GET() {
       };
     });
     
+    console.log('Final transformed menu items:', JSON.stringify(menuItems, replaceBigInt, 2));
+    
     const headers = {
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=7200',
     };
     
     return NextResponse.json(menuItems, { headers });
