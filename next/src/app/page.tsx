@@ -9,161 +9,131 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { bangladeshRed } from '@/theme';
-import PageLayout from '@/components/PageLayout';
 
 export default function Home() {
   return (
-    <PageLayout>
-      <Box sx={{ width: '100%' }}>
-        <Box sx={{ 
-          bgcolor: 'background.paper',
-          pt: { xs: 6, sm: 8 },
-          pb: { xs: 8, sm: 12 },
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}>
-          <Box sx={{ 
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            px: { xs: 2, sm: 3 },
-            margin: '0 auto',
-          }}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography
-                variant="h1"
-                component="h1"
-                align="center"
-                gutterBottom
-                sx={{ 
-                  color: 'white',
-                  fontWeight: 'bold',
-                  fontSize: { xs: '2.5rem', sm: '3.75rem' }
-                }}
-              >
-                Mezbani Chai House
-              </Typography>
-              <Typography 
-                component="p" 
-                sx={{ 
-                  color: 'text.secondary',
-                  mb: 4,
-                  fontSize: { xs: '1.1rem', sm: '1.5rem' },
-                  maxWidth: '800px',
-                  mx: 'auto',
-                }}
-              >
-                Experience the authentic taste of Bangladesh in every cup of our
-                handcrafted chai
-              </Typography>
-              <Link href="/order" passHref style={{ textDecoration: 'none' }}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    mt: 4,
-                    backgroundColor: bangladeshRed,
-                    '&:hover': {
-                      backgroundColor: bangladeshRed,
-                      filter: 'brightness(1.1)',
-                    },
-                    px: { xs: 3, sm: 6 },
-                    py: { xs: 1.5, sm: 2 },
-                    fontSize: { xs: '1rem', sm: '1.25rem' },
-                  }}
-                >
-                  Order Now
-                </Button>
-              </Link>
-            </Box>
-          </Box>
-        </Box>
-
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ 
+        bgcolor: bangladeshRed[900],
+        pt: { xs: 6, sm: 8 },
+        pb: { xs: 8, sm: 12 },
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}>
         <Box sx={{ 
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           width: '100%',
-          py: { xs: 4, md: 6 },
+          maxWidth: 'lg',
           px: { xs: 2, sm: 3 },
           margin: '0 auto',
         }}>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <Paper
-                elevation={0}
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography
+              variant="h1"
+              component="h1"
+              align="center"
+              gutterBottom
+              sx={{ 
+                color: 'common.white',
+                fontWeight: 'bold',
+                fontSize: { xs: '2.5rem', sm: '3.75rem' }
+              }}
+            >
+              Mezbani Chai House
+            </Typography>
+            <Typography 
+              component="p" 
+              variant="h5"
+              sx={{ 
+                color: 'common.white',
+                mb: 4,
+                maxWidth: 600,
+                mx: 'auto'
+              }}
+            >
+              Experience the authentic taste of Bangladeshi chai and snacks
+            </Typography>
+            <Box sx={{ mt: 4 }}>
+              <Button
+                component={Link}
+                href="/menu"
+                variant="contained"
+                size="large"
                 sx={{
-                  p: 4,
-                  height: '100%',
-                  backgroundColor: 'rgba(0, 106, 78, 0.1)',
-                  transition: 'transform 0.2s ease-in-out',
+                  bgcolor: 'common.white',
+                  color: bangladeshRed[900],
                   '&:hover': {
-                    transform: 'translateY(-4px)',
+                    bgcolor: 'grey.100',
+                  },
+                  mr: 2,
+                }}
+              >
+                View Menu
+              </Button>
+              <Button
+                component={Link}
+                href="/contact"
+                variant="outlined"
+                size="large"
+                sx={{
+                  borderColor: 'common.white',
+                  color: 'common.white',
+                  '&:hover': {
+                    borderColor: 'grey.100',
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
                   },
                 }}
               >
-                <Typography variant="h5" gutterBottom color="white">
-                  Our Story
-                </Typography>
-                <Typography component="p" color="text.secondary">
-                  Founded with a passion for authentic Bangladeshi chai, Mezbani brings
-                  the rich tradition of tea culture to Watertown, MA. Every cup tells a
-                  story of heritage and craftsmanship.
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 4,
-                  height: '100%',
-                  backgroundColor: 'rgba(244, 42, 65, 0.1)',
-                  transition: 'transform 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                  },
-                }}
-              >
-                <Typography variant="h5" gutterBottom color="white">
-                  Special Events
-                </Typography>
-                <Typography component="p" color="text.secondary">
-                  Host your next gathering with us! From corporate events to intimate
-                  celebrations, we offer chai catering services that will make your
-                  event memorable.
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 4,
-                  height: '100%',
-                  backgroundColor: 'rgba(0, 106, 78, 0.1)',
-                  transition: 'transform 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                  },
-                }}
-              >
-                <Typography variant="h5" gutterBottom color="white">
-                  Catering
-                </Typography>
-                <Typography component="p" color="text.secondary">
-                  Bring the warmth of Mezbani to your workplace or special event.
-                  Our catering services include a variety of chai options and
-                  traditional Bangladeshi snacks.
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
+                Contact Us
+              </Button>
+            </Box>
+          </Box>
         </Box>
       </Box>
-    </PageLayout>
+
+      <Box sx={{ py: 8, px: { xs: 2, sm: 3 } }}>
+        <Grid container spacing={4} maxWidth="lg" sx={{ margin: '0 auto' }}>
+          <Grid item xs={12} md={4}>
+            <Paper elevation={2} sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h5" gutterBottom>
+                Authentic Chai
+              </Typography>
+              <Typography>
+                Our chai is brewed using traditional Bangladeshi methods and spices, 
+                creating a perfect blend of flavors that will transport you straight 
+                to the streets of Dhaka.
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Paper elevation={2} sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h5" gutterBottom>
+                Fresh Snacks
+              </Typography>
+              <Typography>
+                Enjoy our selection of freshly made Bangladeshi snacks, perfect 
+                companions to your cup of chai. From samosas to shingaras, we have 
+                all your favorites.
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Paper elevation={2} sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h5" gutterBottom>
+                Warm Atmosphere
+              </Typography>
+              <Typography>
+                Our cozy space is designed to make you feel at home. Whether you're 
+                meeting friends or looking for a quiet spot to work, we've got you covered.
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 }

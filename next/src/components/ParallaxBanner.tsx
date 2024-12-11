@@ -26,10 +26,11 @@ export default function ParallaxBanner({ imagePath, title, height = 400 }: { ima
           src={imagePath}
           alt={title}
           fill
-          priority={imagePath === '/images/chai-banner.jpg'}
+          loading="eager"
           sizes="(max-width: 1200px) 100vw, 1200px"
           style={{
             objectFit: 'cover',
+            objectPosition: 'center',
           }}
           quality={85}
         />

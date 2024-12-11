@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
@@ -14,9 +14,9 @@
     "transpileOnly": true,
     "files": true,
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "ESNext"
     }
   },
-  "include": ["./**/*.ts"],
+  "include": ["./**/*.mts"],
   "exclude": ["node_modules"]
 }
