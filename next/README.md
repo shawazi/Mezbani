@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mezbani
+
+A modern restaurant management system built with Next.js and Material-UI.
+
+## Tech Stack
+
+- **Framework:** Next.js 15.0.0 (React 18)
+- **UI Components:** Material-UI (MUI) v5
+- **Styling:** Emotion for styled components
+- **Forms:** React Hook Form
+- **Payment Processing:** Square Web SDK & API
+- **Backend Services:** Firebase & Firebase Admin
+- **Language:** TypeScript
+- **Development Tools:**
+  - ESLint for code linting
+  - Sharp for image optimization
+  - Critters for CSS inlining
+
+## Project Structure
+
+```
+next/
+├── src/
+│   ├── app/          # Next.js App Router pages and layouts
+│   ├── lib/          # Shared utilities and API clients
+│   └── components/   # Reusable React components
+├── public/           # Static assets
+├── scripts/         # Build and utility scripts
+└── tsconfig.json    # TypeScript configuration
+```
+
+## Features
+
+- Modern React development with Next.js App Router
+- Server-side rendering and static site generation
+- Integrated payment processing with Square
+- Firebase backend integration
+- Type-safe development with TypeScript
+- Responsive Material Design UI
+- Optimized image processing
+- Environment-based configuration
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` - Start development server
+- `npm run build` - Build production application
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run typecheck` - Run TypeScript type checking
+- `npm run populate-catalog` - Populate Square catalog data
 
-## Learn More
+## Development
 
-To learn more about Next.js, take a look at the following resources:
+This project follows Next.js best practices and conventions. The App Router architecture is used for routing and layouts. Material-UI components are used for the user interface, with custom styling applied through Emotion.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For more information about the technologies used:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Material-UI Documentation](https://mui.com/material-ui/)
+- [Square Web SDK Documentation](https://developer.squareup.com/docs/web-sdk)
