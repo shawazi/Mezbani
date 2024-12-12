@@ -8,7 +8,16 @@ Visit our site at: [mezbani.shawaz.org](https://mezbani.shawaz.org)
 
 ## 🚀 Tech Stack
 
-### Frontend
+### Next.js Implementation (Latest)
+- **Framework**: Next.js 15.0.0 with App Router
+- **UI Library**: Material-UI (MUI) v5
+- **Forms**: React Hook Form
+- **Payment**: Square Web SDK & API
+- **Backend**: Firebase Admin SDK
+- **Language**: TypeScript
+- **Tools**: ESLint, Sharp for image optimization
+
+### Legacy Frontend (Vite)
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **UI Library**: Material-UI (MUI)
@@ -27,6 +36,36 @@ Visit our site at: [mezbani.shawaz.org](https://mezbani.shawaz.org)
 
 ## 🛠️ Development Setup
 
+### Next.js App (Recommended)
+1. **Navigate to Next.js directory**
+   ```bash
+   cd next
+   ```
+
+2. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   ```
+   Fill in the required environment variables:
+   - Firebase configuration
+   - Square API credentials
+   - Firebase Admin SDK credentials
+
+3. **Installation & Development**
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+4. **Available Scripts**
+   - `npm run dev` - Start development server
+   - `npm run build` - Build production application
+   - `npm run start` - Start production server
+   - `npm run lint` - Run ESLint
+   - `npm run typecheck` - Run TypeScript type checking
+   - `npm run populate-catalog` - Populate Square catalog data
+
+### Legacy Frontend Setup
 1. **Prerequisites**
    - Node.js 20+
    - npm 9+
@@ -104,106 +143,18 @@ Visit our site at: [mezbani.shawaz.org](https://mezbani.shawaz.org)
    npm run build
    ```
 
-## 📝 Firebase Configuration
-
-### Square Integration Setup
-
-1. **Square Developer Account**
-   - Create a [Square Developer Account](https://developer.squareup.com/)
-   - Create a new application in the Developer Dashboard
-   - Note down your:
-     - Sandbox Access Token (for testing)
-     - Production Access Token (for live site)
-     - Booking site URL from Square Dashboard > Booking > Online Booking Site
-
-2. **Firebase Function Configuration**
-   ```bash
-   # Set Square credentials in Firebase
-   firebase functions:config:set square.accesstoken="YOUR_SQUARE_ACCESS_TOKEN" square.bookingurl="YOUR_SQUARE_BOOKING_URL"
-
-   # Verify configuration
-   firebase functions:config:get
-   ```
-
-3. **Install Square Dependencies**
-   ```bash
-   cd functions
-   npm install square
-   ```
-
-### Firestore Security Rules
-Located in `frontend/firestore.rules`:
-```javascript
-rules_version = '2';
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /menu/{menuItem} {
-      allow read: if
-        // Allow authenticated users (including anonymous)
-        request.auth != null &&
-        // Allow from your domains
-        (
-          request.origin.matches('https://mezbani-14d1e.web.app') || 
-          request.origin.matches('https://mezbani-14d1e.firebaseapp.com') ||
-          request.origin.matches('http://localhost:*')
-        );
-      
-      allow write: if false;  // Only allow writes through admin SDK
-    }
-  }
-}
-```
-
-### Firestore Indexes
-Located in `frontend/firestore.indexes.json`:
-```json
-{
-  "indexes": [
-    {
-      "collectionGroup": "menu",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "category", "order": "ASCENDING" },
-        { "fieldPath": "available", "order": "ASCENDING" },
-        { "fieldPath": "name", "order": "ASCENDING" }
-      ]
-    }
-  ]
-}
-```
-
-### Database Schema
-
-#### Menu Items
-```typescript
-interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: 'food' | 'chai';
-  imageUrl?: string;
-  available: boolean;
-  spiceLevel?: 1 | 2 | 3;
-}
-```
-
-## 🧪 Testing
-
-```bash
-# Run ESLint
-npm run lint
-
-# Type checking
-npm run type-check
-```
-
-## 📦 Project Structure
+## 📁 Project Structure
 
 ```
 mezbani/
-├── frontend/           # React application
+├── next/              # Next.js implementation (recommended)
+│   ├── src/
+│   │   ├── app/      # Next.js App Router pages and layouts
+│   │   ├── lib/      # Shared utilities and API clients
+│   │   └── components/# Reusable React components
+│   ├── public/       # Static assets
+│   └── scripts/      # Build and utility scripts
+├── frontend/         # Legacy Vite implementation
 │   ├── src/
 │   │   ├── components/ # Reusable UI components
 │   │   ├── pages/     # Page components
