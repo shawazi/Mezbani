@@ -19,11 +19,13 @@ A modern restaurant management system built with Next.js and Material-UI.
 ## Project Structure
 
 ```
-next/
+.
 ├── src/
 │   ├── app/          # Next.js App Router pages and layouts
+│   ├── components/   # Reusable React components
 │   ├── lib/          # Shared utilities and API clients
-│   └── components/   # Reusable React components
+│   ├── types/        # TypeScript type definitions
+│   └── theme.ts      # Material-UI theme configuration
 ├── public/           # Static assets
 ├── scripts/         # Build and utility scripts
 └── tsconfig.json    # TypeScript configuration
