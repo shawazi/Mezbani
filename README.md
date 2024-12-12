@@ -106,4 +106,6 @@ mezbani/
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Copyright 2024 Mezbani Chai House. All rights reserved.
+
+This is proprietary software. Unauthorized copying, modification, distribution, or use of this software, via any medium, is strictly prohibited.
