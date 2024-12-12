@@ -127,8 +127,8 @@ export default function Home() {
                 Warm Atmosphere
               </Typography>
               <Typography>
-                Our cozy space is designed to make you feel at home. Whether you're 
-                meeting friends or looking for a quiet spot to work, we've got you covered.
+                Our cozy space is designed to make you feel at home. Whether you&apos;re 
+                meeting friends or looking for a quiet spot to work, we&apos;ve got you covered.
               </Typography>
             </Paper>
           </Grid>
